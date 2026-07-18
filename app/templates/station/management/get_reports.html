@@ -1,0 +1,134 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+      <div>
+
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="peopleName" class="p-2 col-form-label">{{_('Tipo')}}</label>
+          <div class="col">
+          <select class="form-control" id="reportType" name="reportType" onchange="">
+              <option value="0" selected>{{_('Todos')}}</option>
+              <option value="1" >{{_('Madrugadores')}}</option>
+              <option value="2">{{_('Madrugadores con almorzo')}}</option>
+              <option value="3">{{_('Comedor')}}</option>
+          </select>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="peopleName" class="p-2 col-form-label">{{_('Nome')}}</label>
+          <div class="col">
+          <select class="form-control" id="peopleName" name="peopleName" onchange="">
+            <option value="0" selected>{{_('Todos')}}</option>
+            {% for student in student_list %}
+              <option value="{{student.id}}">{{student.surname}}, {{student.name}}</option>
+            {% endfor %}
+          </select>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+            <label for="dataFromDate" class="p-2 col-form-label">{{_('Dende')}}</label>
+            <div class="col">
+              <div class="input-group date" id="dataFromDate" name="dataFromDate" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" id="dataFromDateValue" name="dataFromDateValue" data-target="#date-from-date" data-input/>
+                <div class="input-group-append" data-target="#dataFromDate" data-toggle="datetimepicker">
+                  <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="dataToDate" class="p-2 col-form-label">{{_('Ata')}}</label>
+          <div class="col">
+            <div class="input-group date" id="dataToDate" data-target-input="nearest">
+               <input type="text" class="form-control datetimepicker-input" id="dataToDateValue" name="dataToDateValue" data-target="#dataToDate" data-input/>
+               <div class="input-group-append" data-target="#dataToDate" data-toggle="datetimepicker">
+                   <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+               </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <button type="button" class="btn btn-warning w-100" id="healthTestButton" onclick="generateReport()">{{_('Obter listaxe')}}</button>
+          <button type="button" class="btn btn-primary w-100"  onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+        </div>
+        <input type="hidden" id="dataType" name="dataType">
+      </div>
+</div>
+
+{% endblock body %}
+
+{% block cur_navlink %}'nav-link-manage-reports'{% endblock cur_navlink%}
+
+{% block js_script %}
+
+<script type="text/javascript">
+    $(function () {
+        var fpFrom = flatpickr('#dataFromDate', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            defaultDate: new Date(),
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) fpTo.set('minDate', selectedDates[0]);
+            }
+        });
+        var fpTo = flatpickr('#dataToDate', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            defaultDate: new Date(),
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) fpFrom.set('maxDate', selectedDates[0]);
+            }
+        });
+    });
+
+  function generateReport(){
+        let form1 = document.createElement("form");
+        form1.setAttribute("id", "form123");
+        form1.setAttribute("method", "POST");
+        form1.setAttribute("action", "{{url_for('reports_bp.create_report_post')}}");
+
+        let input1 = document.createElement("input");
+        input1.setAttribute("id", "reportType");
+        input1.setAttribute("type", "text");
+        input1.setAttribute("name", "reportType");
+        input1.setAttribute("value", $("#reportType").val());
+        input1.setAttribute("style", "display:none;");
+
+        let input2 = document.createElement("input");
+        input2.setAttribute("id", "validFrom");
+        input2.setAttribute("type", "text");
+        input2.setAttribute("name", "validFrom");
+        input2.setAttribute("value", $("#dataFromDateValue").val());
+        input2.setAttribute("style", "display:none;");
+
+        let input3 = document.createElement("input");
+        input3.setAttribute("id", "validUntil");
+        input3.setAttribute("type", "text");
+        input3.setAttribute("name", "validUntil");
+        input3.setAttribute("value", $("#dataToDateValue").val());
+        input3.setAttribute("style", "display:none;");
+
+        let input4 = document.createElement("input");
+        input4.setAttribute("id", "student");
+        input4.setAttribute("type", "text");
+        input4.setAttribute("name", "student");
+        input4.setAttribute("value", $("#peopleName").val());
+        input4.setAttribute("style", "display:none;");
+
+        form1.appendChild(input1);
+        form1.appendChild(input2);
+        form1.appendChild(input3);
+        form1.appendChild(input4);
+        form1.appendChild(csrfInput());
+
+        document.body.appendChild(form1);
+        form1.submit();
+    }
+
+</script>
+
+{% endblock js_script%}

@@ -1,0 +1,73 @@
+<script>
+  $(document).ready(function(){
+    
+    {%  with toast_msg_list = get_flashed_messages() %}
+    {% if toast_msg_list %}
+        $("#infoToastTitle").text('{{toast_msg_list[0].Title}}')
+        $("#infoToastText").text('{{toast_msg_list[0].Info}}')
+        format = $("#infoToastHeader").attr('class').split(/\s+/);
+        if(format.indexOf("bg-")>-1){
+          $("#infoToastHeader").removeClass(format[format.indexOf("bg-")]);
+        }
+        if(format.indexOf("text-")>-1){
+          $("#infoToastHeader").removeClass(format[format.indexOf("text-")]);
+        }
+        {% if toast_msg_list[0].Type == 0 %}
+          $("#infoToastHeader").addClass("bg-danger");
+          $("#infoToastHeader").addClass("text-white");
+        {% elif toast_msg_list[0].Type == 1 %}
+          $("#infoToastHeader").addClass("bg-success");
+          $("#infoToastHeader").addClass("text-white");
+        {% elif toast_msg_list[0].Type == 2 %}
+          $("#infoToastHeader").addClass("bg-info");
+          $("#infoToastHeader").addClass("text-white");
+        {% elif toast_msg_list[0].Type == 3 %}
+          $("#infoToastHeader").addClass("bg-dark");
+          $("#infoToastHeader").addClass("text-white");
+        {% endif %}
+        new bootstrap.Toast(document.getElementById('infoToast'), { delay: 3000 }).show();
+    {% endif %}
+    {% endwith %}
+  });
+
+  $('#infoToast').on('show.bs.toast', function () {
+    $("#infoToastContainer").css("display", "block");
+  });
+
+  $('#infoToast').on('hidden.bs.toast', function () {
+    $("#infoToastContainer").css("display", "none");
+  });
+
+  //////////////////////////////////////////////////////////////////////////
+
+  function showInfoToast(st_title, st_text, toast_type){
+
+    $("#infoToastTitle").text(st_title);
+    $("#infoToastText").text(st_text);
+    format = $("#infoToastHeader").attr('class').split(/\s+/);
+    if(format.indexOf("bg-")>-1){
+      $("#infoToastHeader").removeClass(format[format.indexOf("bg-")]);
+    }
+    if(format.indexOf("text-")>-1){
+      $("#infoToastHeader").removeClass(format[format.indexOf("text-")]);
+    }
+    if(toast_type == 0){
+      $("#infoToastHeader").addClass("bg-danger");
+      $("#infoToastHeader").addClass("text-white");
+    }
+    else if(toast_type == 1){
+      $("#infoToastHeader").addClass("bg-success");
+      $("#infoToastHeader").addClass("text-white");
+    }
+    else if(toast_type == 2){
+      $("#infoToastHeader").addClass("bg-info");
+      $("#infoToastHeader").addClass("text-white");
+    }
+    else if(toast_type == 3){
+      $("#infoToastHeader").addClass("bg-dark");
+      $("#infoToastHeader").addClass("text-white");
+    }
+    new bootstrap.Toast(document.getElementById('infoToast'), { delay: 3000 }).show();
+
+  }
+</script>

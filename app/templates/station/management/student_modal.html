@@ -1,0 +1,44 @@
+<div class="modal" id="selectStudentModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- template schema, hidden from the dom -->
+      <template id="student-template">
+        <!-- template content -->
+        <div class="mb-3 row selected-student-group">
+          <label class="col-8 col-form-label" id="labelStudent"></label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedStudent" type="checkbox" class="primary">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+      </template>
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+        <h5 class="modal-title">{{_("Escoller alumnos vinculados")}}</h5>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid pre-scrollable" id="selectStudentModalBody">
+
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <div class="input-group">
+          <!--<div class="input-group-prepend">
+            <div class="input-group-text">
+               <i class="fa fa-search"></i>
+            </div>
+          </div> -->
+          <!-- <input type="text" class="form-control mr-3" id="filterStudentModalInput" oninput="findStudents()" placeholder="Busca"> -->
+          <!-- <button type="button" class="btn btn-primary ml-3" id="filterStudentModalBtn" onclick="showStudentsFiltered()">{{_("Ver todos")}}</button> -->
+          <button type="button" class="btn btn-primary ms-2" onclick="closeStudentModal()">{{_("Pechar")}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

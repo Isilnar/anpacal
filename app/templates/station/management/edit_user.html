@@ -1,0 +1,530 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+    <form id="userForm" action="{{ url_for('user_bp.list_users') }}" method="POST" style="width:100%;" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="row">
+            <div class="mb-3 col-md-4 wrapper">
+                <label for="selectedUser">{{_("Listaxe de usuarios")}}</label>
+                <select size="15" class="form-select selection" id="selectedUser" name="selectedUser"
+                        onchange="changeUser()">
+                    <option value=0 selected>{{_("Novo usuario")}}</option>
+                    {% for user in users_list %}
+                    <option value={{user.id}}>{{user.get_fullname_reverse()}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3 col-md-8">
+                <div class="row ms-2 me-2">
+                    <div class="col-md-4 input-left">
+                        <label for="userName">{{_("Nome")}}</label>
+                        <input class="form-control" id="userName" name="userName" autocomplete="off" {% if current_edit_user
+                               %}value="{{current_edit_user.name}}" {% endif %}>
+                    </div>
+                    <div class="col-md-8 input-right">
+                        <label for="userSurname">{{_("Apelidos")}}</label>
+                        <input class="form-control" id="userSurname" name="userSurname" {% if current_edit_user
+                               %}value="{{current_edit_user.surname}}" {% endif %}>
+                    </div>
+                </div>
+                <div class="row ms-2 me-2">
+                    <div class="col-md-1 input-left">
+                        <label for="userPartner">{{_("Socio")}}</label>
+                        <label class="switch" style="float: none;display: block;">
+                            <input id="userPartner" name="userPartner" type="checkbox" class="form-control primary">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="col-md-7 input-left">
+                        <label for="userMail">{{_("Correo electrónico")}}</label>
+                        <input class="form-control" id="userMail" name="userMail" {% if current_edit_user
+                               %}value="{{current_edit_user.email}}" {% endif %}>
+                    </div>
+                    <div class="col-md-4 input-right">
+                        <label for="userPhone">{{_("Teléfono")}}</label>
+                        <input class="form-control" id="userPhone" name="userPhone" {% if current_edit_user
+                               %}value="{{current_edit_user.phone}}" {% endif %}>
+                    </div>
+                </div>
+                <div class="row ms-2 me-2">
+                    <div class="col-md-6 input-left">
+                        <label for="numberID">{{_("DNI")}}</label>
+                        <input class="form-control" id="numberID" name="numberID" {% if current_edit_user
+                               %}value="{{current_edit_user.number_id}}" {% endif %}>
+                    </div>
+                    <div class="col-md-6 input-right">
+                        <input type="hidden" id="selectedRolesIds" name="selectedRolesIds">
+                        <label for="selectedRoles">{{_("Roles do usuario")}}</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#selectRoleModal"><i class="fa fa-cog"></i></button>
+                            <input readonly class="form-control" id="selectedRoles" name="selectedRoles" {% if current_edit_user %}value="{{current_edit_user.get_roles_string()}}" {% endif %}>
+                        </div>
+                    </div>
+                </div>
+                <div class="row ms-2 me-2">
+                    <div class="col-md-6 input-left">
+                        <label for="userLogin">{{_("Conta de usuario")}}</label>
+                        <input class="form-control" id="userLogin" name="userLogin" autocomplete="username" {% if current_edit_user %}value="{{current_edit_user.username}}" {% endif %}>
+                    </div>
+                    <div class="col-md-6 input-right">
+                        <label for="userPass">{{_("Contrasinal")}}</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-primary" onclick="resetPass()"><i class="fa fa-refresh"></i></button>
+                            <input type="password" class="form-control" id="userPass" name="userPass" autocomplete="new-password" {% if current_edit_user %}placeholder="••••••••"{% endif %}>
+                        </div>
+                    </div>
+                </div>
+                <div class="row ms-2 me-2">
+                    <div class="col-md-6 input-left">
+                        <input type="hidden" id="selectedStudentsIds" name="selectedStudentsIds">
+                        <label for="selectedStudents">{{_("Alumnos vinculados")}}</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="showStudentModal();"><i class="fa fa-graduation-cap"></i></button>
+                            <input readonly class="form-control" id="selectedStudents" name="selectedStudents" {% if current_edit_user %}value="{{current_edit_user.get_students_string()}}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="col-md-6 input-right">
+                        <input type="hidden" id="selectedSchoolsIds" name="selectedSchoolsIds">
+                        <label for="selectedSchools">{{_("Centros do usuario")}}</label>
+                        <div class="input-group">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#selectSchoolModal"><i class="fa fa-cog"></i></button>
+                            <input readonly class="form-control" id="selectedSchools" name="selectedSchools" {% if current_edit_user %}value="{{current_edit_user.get_schools_string()}}" {% endif %}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <button type="button" class="btn btn-success w-100" onclick="saveUser()">{{_("Gardar")}}</button>
+            <button type="button" class="btn btn-warning w-100" onclick="sendPass()" id="sendPassBtn" {% if not current_edit_user %}style="display: none;" {% else %}style="display: block;" {% endif %}>
+                {{_("Reenviar contrasinal")}}
+            </button>
+            <button type="button" class="btn btn-dark w-100" onclick="deleteUser()" id="deleteUserBtn" {% if not current_edit_user %}style="display: none;" {% else %}style="display: block;" {% endif %}>
+                {{_("Borrar")}}
+            </button>
+            <button type="button" class="btn btn-primary w-100"
+                    onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}
+            </button>
+        </div>
+        {% include 'station/management/role_modal.html' %}
+        {% include 'station/management/school_modal.html' %}
+        {% include 'station/management/student_modal.html' %}
+    </form>
+</div>
+
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+const MSG_NAME_REQUIRED = "{{ _('Debe poñer un nome') }}";
+const MSG_SURNAME_REQUIRED = "{{ _('Debe poñer un apelido') }}";
+const MSG_USERNAME_REQUIRED = "{{ _('Debe poñer un usuario') }}";
+const MSG_PASSWORD_REQUIRED = "{{ _('Debe poñer un contrasinal') }}";
+const MSG_USERNAME_EXISTS = "{{ _('Xa existe o usuario, non se pode dar de alta') }}";
+
+// Store initial roles and schools for "new user" reset
+const INITIAL_ROLES = [
+  {% for r in roles_list %}
+  {id: {{r.id}}, description: "{{r.description}}", is_selected: 0},
+  {% endfor %}
+];
+const INITIAL_SCHOOLS = [
+  {% for school in schools_list %}
+  {id: {{school.id}}, name: "{{school.name}}", is_selected: {% if schools_list|length == 1 %}1{% else %}0{% endif %}},
+  {% endfor %}
+];
+
+function showStudentModal(){
+    console.log("Student modal...");
+    let students_ids = $("#selectedStudentsIds").val();
+    loadStudentData(students_ids);
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('selectStudentModal')).show();
+}
+
+function loadStudentData(students_ids){
+    console.log("Ids de alumnos para cargar:", students_ids);
+    let e = document.getElementById("selectedUser");
+    let current_user = e.options[e.selectedIndex].value;
+    console.log("Usuario: ", current_user);
+
+    let data_request = {"user": current_user};
+    fetch("{{ url_for('student_bp.get_all_students') }}", {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify(data_request), // data can be `string` or {object}!
+        headers:{'Content-Type': 'application/json'
+    }
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data_array) {
+        console.log("All_students: ", data_array);
+        fillAllStudents(data_array);
+    });
+
+}
+
+function fillAllStudents(data){
+    $( "#selectStudentModalBody" ).empty();
+
+    let students_ids = $("#selectedStudentsIds").val().split(",");
+    console.log("Fill...: ", students_ids);
+
+    for (let i = 0; i < data.length; i++) {
+        let template_clone = document.querySelector('#student-template').content.cloneNode(true);
+        template_clone.getElementById("labelStudent").innerHTML = '<b>' + data[i]["surname"] + ', ' + data[i]["name"] + '</b>';
+        template_clone.getElementById("selectedStudent").id = "selectedStudent-" + data[i]["id"].toString();
+        if (data[i]["associated"]){
+            template_clone.getElementById("selectedStudent-" + data[i]["id"].toString()).checked = true;
+        }
+        else{
+            template_clone.getElementById("selectedStudent-" + data[i]["id"].toString()).checked = false;
+        }
+
+        if (students_ids.includes(data[i]["id"].toString())){
+             template_clone.getElementById("selectedStudent-" + data[i]["id"].toString()).checked = true;
+        }
+        else{
+            template_clone.getElementById("selectedStudent-" + data[i]["id"].toString()).checked = false;
+        }
+
+        document.querySelector("#selectStudentModalBody").appendChild(template_clone);
+    }
+
+
+}
+
+function validateUserData(){
+    removeErrors();
+
+    let res = true;
+
+    if ($("#userName").val() === ""){
+        res = false;
+        showError("userName", MSG_NAME_REQUIRED);
+    }
+
+    if ($("#userSurname").val() === ""){
+        res = false;
+        showError("userSurname", MSG_SURNAME_REQUIRED);
+    }
+
+    if ($("#userLogin").val() === ""){
+        res = false;
+        showError("userLogin", MSG_USERNAME_REQUIRED);
+    }
+
+    if ($("#selectedUser").val() === "0" && $("#userPass").val() === ""){
+        res = false;
+        showError("userPass", MSG_PASSWORD_REQUIRED);
+    }
+
+    return res;
+}
+
+function saveUser(){
+    console.log("Antes de validar");
+    if (validateUserData()){
+        console.log("Despues de validar");
+        saveUserData();
+    }
+}
+
+function saveUserData(){
+    console.log("111");
+    let data_request = {"username": $("#userLogin").val()};
+    console.log("222");
+    if ($("#selectedUser").val() === "0"){
+        fetch("{{ url_for('user_bp.check_exists_username') }}", {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(data_request), // data can be `string` or {object}!
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data_array) {
+            if (data_array["exists"] == 0){
+                console.log("HAce submit");
+                $("form").submit();
+            }
+            else{
+                console.log("Falla, el usuer existe");
+                showError("userLogin", MSG_USERNAME_EXISTS);
+            }
+        });
+    }
+    else{
+        console.log("333");
+        var userId = $("#selectedUser").val();
+        var editUrl = "{{ url_for('user_bp.edit_user', user_id=0) }}".replace('/0', '/' + userId);
+        document.forms['userForm'].setAttribute('action', editUrl);
+        $("form").submit();
+    }
+}
+
+function deleteUser(){
+  var e = document.getElementById("selectedUser");
+  var userId = e.options[e.selectedIndex].value;
+  var deleteUrl = "{{ url_for('user_bp.delete_user', user_id=0) }}".replace('/0/', '/' + userId + '/');
+  document.forms['userForm'].setAttribute('action', deleteUrl);
+  document.forms['userForm'].submit();
+}
+
+function sendPass(){
+
+  var e = document.getElementById("selectedUser");
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'sendPassUserId'
+  input.value = e.options[e.selectedIndex].value
+  document.forms['userForm'].appendChild(input);
+  saveUser();
+}
+
+function changeUser(){
+
+  var e = document.getElementById("selectedUser");
+  if(e.options[e.selectedIndex].value=='0'){
+    document.getElementById("deleteUserBtn").style.display="none";
+    document.getElementById("sendPassBtn").style.display="none";
+  }else{
+    document.getElementById("deleteUserBtn").style.display="block";
+    document.getElementById("sendPassBtn").style.display="block";
+  }
+  loadUser();
+}
+
+function loadUser(){
+
+  var e = document.getElementById("selectedUser");
+  var userId = e.options[e.selectedIndex].value;
+
+  if (userId === '0') {
+    document.getElementById("userName").value = '';
+    document.getElementById("userSurname").value = '';
+    document.getElementById("userLogin").value = '';
+    document.getElementById("numberID").value = '';
+    document.getElementById("userPhone").value = '';
+    document.getElementById("userMail").value = '';
+    document.getElementById("userPass").value = '';
+    document.getElementById("userPass").placeholder = '';
+    document.getElementById("selectedStudents").value = '';
+    document.getElementById("selectedStudentsIds").value = '';
+    document.getElementById("selectedRoles").value = '';
+    document.getElementById("selectedRolesIds").value = '';
+    document.getElementById("selectedSchools").value = '';
+    document.getElementById("selectedSchoolsIds").value = '';
+    $('#userPartner').attr('checked', false);
+    populateRoleModal(INITIAL_ROLES);
+    populateSchoolModal(INITIAL_SCHOOLS);
+    return;
+  }
+
+  var baseUrl = "{{ url_for('user_bp.get_user', user_id=0) }}".replace('/0', '/' + userId);
+  fetch(baseUrl, {
+    method: 'GET',
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    console.log("User_data: ", data_array);
+    document.getElementById("userName").value = data_array.name;
+    document.getElementById("userSurname").value = data_array.surname;
+    document.getElementById("userLogin").value = data_array.username;
+    document.getElementById("numberID").value = data_array.number_id;
+    document.getElementById("userPhone").value = data_array.phone;
+    document.getElementById("userMail").value = data_array.email;
+    document.getElementById("userPass").value = '';
+    document.getElementById("userPass").placeholder = '••••••••';
+    document.getElementById("selectedStudents").value = data_array.students_associated;
+    document.getElementById("selectedStudentsIds").value = data_array.students_associated_ids;
+    if (data_array.user_partner === 'on'){
+        $('#userPartner').attr('checked', true);
+    }
+    else{
+        $('#userPartner').attr('checked', false);
+    }
+    populateRoleModal(data_array.roles);
+    populateSchoolModal(data_array.schools);
+    populateStudentModal(data_array.students_associated);
+  });
+}
+
+function populateSchoolModal(schools_array){
+
+  let schools_string = '';
+  let schools_ids = [];
+  let template = document.querySelector('#school-template');
+  let area = document.querySelector('#selectSchoolModalBody');
+  area.innerHTML = '';
+  for (let i = 0; i < schools_array.length; i++) {
+    html_msg = getHtmlSchool(template, schools_array[i]);
+    area.appendChild(html_msg);
+    if(schools_array[i]["is_selected"]==1){
+      if(schools_string.length > 0){
+        schools_string = schools_string.concat(', ')
+      }
+      schools_string = schools_string.concat(schools_array[i]["name"]);
+      schools_ids.push(schools_array[i]["id"]);
+    }
+  }
+  document.getElementById("selectedSchools").value = schools_string;
+  document.getElementById("selectedSchoolsIds").value = schools_ids;
+  console.log("Schools ids: ", schools_ids);
+}
+
+function getHtmlSchool(template, itemData){
+
+    // Clone the HTML template
+    let template_clone = template.content.cloneNode(true);
+
+    // Query & update the template content
+    if(itemData["is_selected"]==1){
+      template_clone.getElementById("selectedSchool").checked = true;
+    }
+    template_clone.getElementById('labelSchool').setAttribute('for', 'selectedSchool-'+itemData["id"]);
+    template_clone.getElementById('selectedSchool').setAttribute('name', 'selectedSchool-'+itemData["id"]);
+    template_clone.getElementById('labelSchool').innerHTML = itemData["name"];
+    template_clone.getElementById('selectedSchool').id = 'selectedSchool-'+itemData["id"];
+
+    return template_clone;
+}
+
+
+function populateRoleModal(roles_array){
+
+  let roles_string = '';
+  let roles_ids = [];
+  var template = document.querySelector('#role-template');
+  var area = document.querySelector('#selectRoleModalBody');
+  area.innerHTML = '';
+  for (var i = 0; i < roles_array.length; i++) {
+    html_msg = getHtmlRole(template, roles_array[i]);
+    // Append template to dom
+    area.appendChild(html_msg);
+    if(roles_array[i]["is_selected"]==1){
+      if(roles_string.length > 0){
+        roles_string = roles_string.concat(', ')
+      }
+      roles_string = roles_string.concat(roles_array[i]["description"])
+      roles_ids.push(roles_array[i]["id"]);
+    }
+  }
+  document.getElementById("selectedRoles").value = roles_string;
+  document.getElementById("selectedRolesIds").value = roles_ids;
+  console.log("Carga los roles ids: ", roles_ids);
+}
+
+function getHtmlRole(template, itemData){
+
+    // Clone the HTML template
+    let template_clone = template.content.cloneNode(true);
+
+    // Query & update the template content
+    if(itemData["is_selected"]==1){
+      template_clone.getElementById("selectedRole").checked = true;
+    }
+    template_clone.getElementById('labelRole').setAttribute('for', 'selectedRole-'+itemData["id"]);
+    template_clone.getElementById('selectedRole').setAttribute('name', 'selectedRole-'+itemData["id"]);
+    template_clone.getElementById('labelRole').innerHTML = itemData["description"];
+    template_clone.getElementById('selectedRole').id = 'selectedRole-'+itemData["id"];
+
+    return template_clone;
+}
+
+function closeSchoolModal(){
+    let schools_string = '';
+    let schools_ids = [];
+    $(".selected-school-group ").each(function() {
+        if($(this).find('input[type="checkbox"]').is(':checked')){
+            if(schools_string.length > 0){
+                schools_string = schools_string.concat(', ')
+            }
+            schools_string = schools_string.concat($(this).children('label').text());
+            schools_ids.push($(this).find('input').attr('id').split("-")[1]);
+        }
+    });
+    document.getElementById("selectedSchools").value = schools_string;
+    document.getElementById("selectedSchoolsIds").value = schools_ids;
+    bootstrap.Modal.getInstance(document.getElementById('selectSchoolModal'))?.hide();
+}
+
+function closeRoleModal(){
+    let roles_string = '';
+    let roles_ids = [];
+    $(".selected-role-group ").each(function() {
+        if($(this).find('input[type="checkbox"]').is(':checked')){
+            if(roles_string.length > 0){
+                roles_string = roles_string.concat(', ')
+            }
+            roles_string = roles_string.concat($(this).children('label').text());
+            roles_ids.push($(this).find('input').attr('id').split("-")[1]);
+        }
+    });
+    document.getElementById("selectedRoles").value = roles_string;
+    document.getElementById("selectedRolesIds").value = roles_ids;
+    console.log("Roles_ids: ", roles_ids);
+    bootstrap.Modal.getInstance(document.getElementById('selectRoleModal'))?.hide();
+}
+
+function populateStudentModal(students_array){
+    console.log("Entra en cubir alumnos: ", students_array);
+}
+
+function closeStudentModal(){
+
+    bootstrap.Modal.getInstance(document.getElementById('selectStudentModal'))?.hide();
+    let students_string = '';
+    let students_ids = [];
+    $(".selected-student-group ").each(function() {
+        if($(this).find('input[type="checkbox"]').is(':checked')){
+            if(students_string.length > 0){
+                students_string = students_string.concat('; ')
+            }
+            students_string = students_string.concat($(this).children('label').text());
+            students_ids.push($(this).find('input').attr('id').split("-")[1]);
+        }
+    });
+    document.getElementById("selectedStudents").value = students_string;
+    document.getElementById("selectedStudentsIds").value = students_ids;
+    console.log("Students_ids: ", students_ids);
+
+}
+
+function findStudents(){
+    alert("Hello world");
+
+}
+
+function resetPass(){
+
+  let e = document.getElementById("selectedUser");
+  let data_request = {user_id: e.options[e.selectedIndex].value}
+  fetch("{{ url_for('user_bp.generate_password') }}", {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data_request), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    document.getElementById("userPass").value = data_array.password;
+  });
+}
+
+
+</script>
+{% endblock js_script%}
+
+{% block cur_navlink %}'nav-link-manage-users'{% endblock cur_navlink%}

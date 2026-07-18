@@ -1,0 +1,306 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+
+{% block body %}
+<template id="search-template">
+    <div id="search-container" class="col-md-11 border border-4 rounded p-2">
+        <div class="d-flex flex-row">
+            <div id="register-student" class="p-2"></div>
+            <div id="register-type" class="p-2"></div>
+            <div id="register-date" class="p-2"></div>
+        </div>
+    </div>
+</template>
+
+<div class="container-fluid mt-3 mb-3">
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="reportType" class="p-2 col-form-label">{{_('Tipo')}}</label>
+          <div class="col">
+              <select class="form-control" id="reportType" name="reportType" onchange="">
+                  <option value="0" selected>{{_('Todos')}}</option>
+                  <option value="1" >{{_('Madrugadores')}}</option>
+                  <option value="2">{{_('Madrugadores con almorzo')}}</option>
+                  <option value="3">{{_('Comedor')}}</option>
+              </select>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="peopleName" class="p-2 col-form-label">{{_('Alumno')}}</label>
+          <div class="col">
+          <select class="form-control" id="peopleName" name="peopleName" onchange="">
+            <option value="0" selected>{{_('Todos')}}</option>
+            {% for student in student_list %}
+              <option value="{{student.id}}">{{student.surname}}, {{student.name}}</option>
+            {% endfor %}
+          </select>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="userName" class="p-2 col-form-label">{{_('Usuario')}}</label>
+          <div class="col">
+          <select class="form-control" id="usereName" name="userName" onchange="">
+            <option value="0" selected>{{_('Todos')}}</option>
+            {% for user in user_list %}
+              <option value="{{user.id}}">{{user.surname}}, {{user.name}}</option>
+            {% endfor %}
+          </select>
+          </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+            <label for="dataFromDate" class="p-2 col-form-label">{{_('Dende')}}</label>
+            <div class="col">
+              <div class="input-group date" id="dataFromDate" name="dataFromDate" data-target-input="nearest">
+                <input type="text" class="form-control datetimepicker-input" id="dataFromDateValue" name="dataFromDateValue" data-target="#date-from-date" data-input/>
+                <div class="input-group-append" data-target="#dataFromDate" data-toggle="datetimepicker">
+                  <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="dataToDate" class="p-2 col-form-label">{{_('Ata')}}</label>
+          <div class="col">
+            <div class="input-group date" id="dataToDate" data-target-input="nearest">
+               <input type="text" class="form-control datetimepicker-input" id="dataToDateValue" name="dataToDateValue" data-target="#dataToDate" data-input/>
+               <div class="input-group-append" data-target="#dataToDate" data-toggle="datetimepicker">
+                   <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+               </div>
+            </div>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xs-4 p-2">
+                <button type="button" class="btn btn-secondary w-100" id="healthTestButton" onclick="findRegisters()">{{_('Procurar')}}</button>
+            </div>
+            <div class="col-xs-4 p-2">
+                <button type="button" class="btn btn-warning w-100" id="healthTestButton" onclick="newRegister()">{{_('Novo rexistro')}}</button>
+            </div>
+            <div class="col-xs-4 p-2">
+                <button type="button" class="btn btn-primary w-100"  onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+            </div>
+        </div>
+        <input type="hidden" id="dataType" name="dataType">
+        <br />
+        <div id="search-deck" class="row pre-scrollable">
+        </div>
+</div>
+
+{% include 'station/management/edit_register_modal.html' %}
+
+{% endblock body %}
+
+{% block cur_navlink %}'nav-link-manage-registers'{% endblock cur_navlink%}
+
+{% block js_script %}
+
+<script type="text/javascript">
+    $(function () {
+        var fpFrom = flatpickr('#dataFromDate', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            defaultDate: new Date(),
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) fpTo.set('minDate', selectedDates[0]);
+            }
+        });
+        var fpTo = flatpickr('#dataToDate', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            defaultDate: new Date(),
+            onChange: function(selectedDates) {
+                if (selectedDates[0]) fpFrom.set('maxDate', selectedDates[0]);
+            }
+        });
+        flatpickr('#dateModal', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            clickOpens: false
+        });
+    });
+
+    function findRegisters(){
+
+        let register_type = $("#reportType").val();
+        let register_student = $("#peopleName").val();
+        let register_user = $("#usereName").val();
+        let register_from = $("#dataFromDateValue").val();
+        let register_until = $("#dataToDateValue").val();
+
+        let data_request = {"register_type": register_type, "register_student": register_student,
+            "register_user": register_user, "register_from": register_from, "register_until": register_until};
+
+        console.log("Enviando datos: ", data_request);
+
+        fetch('find_registers_post', {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(data_request), // data can be `string` or {object}!
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data_array) {
+            console.log("Datos de vuelta: ", data_array);
+            $("[id^='search-container-']").remove();
+
+            for (let i=0; i < data_array.length; i++){
+                let template_clone = document.querySelector('#search-template').content.cloneNode(true);
+
+                template_clone.getElementById('register-type').id = 'register-type-' + data_array[i]["id"];
+                template_clone.getElementById('register-type-'+data_array[i]["id"]).innerHTML = data_array[i]["type_text"];
+
+                template_clone.getElementById('register-date').id = 'register-date-' + data_array[i]["id"];
+                template_clone.getElementById('register-date-'+data_array[i]["id"]).innerHTML = data_array[i]["date"];
+
+                template_clone.getElementById('register-student').id = 'register-student-' + data_array[i]["id"];
+                template_clone.getElementById('register-student-'+data_array[i]["id"]).innerHTML = data_array[i]["student"];
+
+                template_clone.getElementById('search-container').id = 'search-container-' + data_array[i]["type"] + "-" + data_array[i]["id"];
+                template_clone.getElementById('search-container-' + data_array[i]["type"] + "-" + data_array[i]["id"]).setAttribute("onclick", "showRegister(" + data_array[i]["id"]+",'" + data_array[i]["type"] + "');");
+
+                document.querySelector('#search-deck').appendChild(template_clone);
+            }
+        });
+    }
+
+    function showRegister(id, type){
+      console.log("Mostrando id: ", id);
+      console.log("Mostrando type: ", type);
+      clearModal();
+
+      $("#registerIdModal").val(id);
+
+      let data_request = {"register_id": id, "register_type":type};
+
+        fetch('get_register_data_post', {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(data_request), // data can be `string` or {object}!
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data_array) {
+            console.log("Datos del registro: ", data_array);
+
+            $("#reportTypeModal").attr("disabled", false);
+            $("#reportTypeModal").val(data_array["type_id"]);
+            $("#reportTypeModal").attr("disabled", true);
+
+            $("#peopleNameModal").attr("disabled", false);
+            $("#peopleNameModal").val(data_array["student_id"]);
+            $("#peopleNameModal").attr("disabled", true);
+
+            $('#dateModalValue').prop('readonly', false);
+            $("#dateModalValue").val(data_array["date_calendar"]);
+            $('#dateModalValue').prop('readonly', true);
+
+            $("#editNotesModal").val(data_array["modify_notes"]);
+
+            if(data_array["not_come"] === 1){
+                console.log("Entra en not come");
+                $("#notComeModal").prop("checked", true);
+            }
+            else{
+                console.log("No entra, tiene valor: ", data_array["not_come"]);
+                $("#notComeModal").prop("checked", false);
+            }
+
+            $("#div-asExtraModal").hide();
+            $("#div-notComeModal").show();
+
+            $("#editRegisterModalTittle").text("{{ _('Editar rexistro') }}");
+            $("#editRegisterModal").show();
+        });
+
+    }
+
+    function closeRegisterModal(){
+        clearModal();
+        $("#editRegisterModal").hide();
+    }
+
+    function newRegister(){
+      $("#registerIdModal").val("0");
+      $("#reportTypeModal").attr("disabled", false);
+      $("#peopleNameModal").attr("disabled", false);
+      $('#dateModalValue').prop('readonly', false);
+
+      clearModal();
+
+      $("#div-asExtraModal").show();
+      $("#div-notComeModal").hide();
+
+      $("#editRegisterModalTittle").text("{{ _('Engadir rexistro') }}");
+      $("#editRegisterModal").show();
+    }
+
+    function clearModal(){
+        $("#reportTypeModal").val(0);
+        $("#peopleNameModal").val(0);
+        $("#dateValueModal").val("");
+
+        $("#asExtraModal").prop( "checked", false );
+        $("#notComeModal").prop( "checked", false );
+        $("#editNotesModal").val("");
+
+    }
+
+    function saveRegisterModal(){
+        if (validateEditModal()){
+            let type_value = $("#reportTypeModal").val();
+            let student_value = $("#peopleNameModal").val();
+            let date_value = $("#dateModalValue").val();
+            let id_value = $("#registerIdModal").val();
+            let register_notes = $("#editNotesModal").val();
+            let asExtra = $("#asExtraModal").is(":checked");
+            let notCome = $("#notComeModal").is(":checked");
+
+            let data_request = {"id": id_value, "type_value": type_value, "student_value": student_value,
+                "date_value": date_value, "register_notes": register_notes, "extra": asExtra, "not_come": notCome};
+
+            fetch('save_registers_post', {
+              method: 'POST', // or 'PUT'
+              body: JSON.stringify(data_request), // data can be `string` or {object}!
+              headers:{
+                'Content-Type': 'application/json'
+              }
+            }).then(function(response) {
+              return response.json();
+            }).then(function(data_array) {
+                console.log("Datos de vuelta: ", data_array);
+                closeRegisterModal();
+            });
+
+            }
+    }
+
+    function validateEditModal(){
+        let result = true;
+
+        let type_value = $("#reportTypeModal").val();
+        let student_value = $("#peopleNameModal").val();
+        let date_value = $("#dateModalValue").val();
+
+        if (type_value === "0"){
+            result = false;
+            showError("reportTypeModal", "Debe escoller un tipo");
+        }
+
+        if (student_value === "0"){
+            result = false;
+            showError("peopleNameModal", "Debe escoller un alumno");
+        }
+
+        if (date_value === ""){
+            result = false;
+            showError("dateModal", "Debe escoller unha data");
+        }
+
+        return result;
+    }
+
+</script>
+
+{% endblock js_script%}

@@ -1,0 +1,345 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+<form id="studentForm" action="{{ url_for('student_bp.list_students') }}" method="POST" style="width:100%;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <div class="row">
+    <div class="mb-3 col-md-4 wrapper">
+      <label for="selectedStudent">{{_("Listaxe de alumnos")}}</label>
+      <select size="18" class="form-select selection" id="selectedStudent" name="selectedStudent" onchange="changeStudent()">
+        <option value=0 {% if not current_student %}selected{% endif %}>{{_("Novo alumnos")}}</option>
+        {% for student in students_list %}
+            <option value={{student.id}} {%if current_student and current_student.id==student.id %}selected{% endif %}>{{student.get_fullname_reverse()}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3 col-md-8">
+      <div class="row ms-2 me-2">
+        <div class="col-md-4 input-left">
+          <label for="studentName">{{_("Nome")}}</label>
+          <input class="form-control" id="studentName" name="studentName" {% if current_student %}value="{{current_student.name}}"{% endif %}>
+        </div>
+        <div class="col-md-8 input-right">
+          <label for="studentSurname">{{_("Apelidos")}}</label>
+          <input class="form-control" id="studentSurname" name="studentSurname" {% if current_student %}value="{{current_student.surname}}"{% endif %}>
+        </div>
+      </div>
+      <div class="row ms-2 me-2">
+        <div class="col-md-1 input-left">
+            <label for="studentChildish">{{_("Infantil")}}</label>
+            <label class="switch" style="float: none;display: block;">
+                <input id="studentChildish" name="studentChildish" type="checkbox" class="form-control primary" onchange="changeChildish()">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="col-md-4 input-left">
+          <label for="studentClassroom">{{_("Curso actual")}}</label>
+
+          <select class="form-select selection" id="studentClassroom" name="studentClassroom">
+            <option value="0">---</option>
+          {% for course in school_courses %}
+            <option value={{course.id}} {%if current_student and current_student.classroom|string()==course.id|string() %}selected{% endif %}>{{course.description}}</option>
+          {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-7 input-right">
+          <label for="selectedSchool">{{_("Centro educativo")}}</label>
+          <select class="form-select selection" id="selectedSchool" name="selectedSchool">
+          {% for school in schools_list %}
+            <option value={{school.id}} {%if current_student and current_student.school_id|string()==school.id|string() %}selected{% endif %}>{{school.name}}</option>
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row ms-2 me-2">
+        <div class="col-md-2 input-left">
+          <label for="studentBrother">{{_("Número de irmán")}}</label>
+          <input class="form-control" id="studentBrother" name="studentBrother" {% if current_student %}value="{{current_student.brother_number}}"{% endif %}>
+        </div>
+        <!-- <div class="col-md-4 input-left">
+          <label for="studentNumber">{{_("Número de rexistro")}}</label>
+          <input class="form-control" id="studentNumber" name="studentNumber" {% if current_student %}value="{{current_student.student_number}}"{% endif %}>
+        </div> -->
+        <div class="col-md-6 input-right">
+          <label for="numberID">{{_("DNI ou documento identificativo")}}</label>
+          <input class="form-control" id="numberID" name="numberID" {% if current_student %}value="{{current_student.number_id}}"{% endif %}>
+        </div>
+      </div>
+      <div class="row ms-2 me-2">
+        <div class="col-md-8 input-left">
+          <label for="studentMail">{{_("Correo electrónico avisos")}}</label>
+          <input class="form-control" id="studentMail" name="studentMail" {% if current_student %}value="{{current_student.email}}"{% endif %}>
+        </div>
+        <div class="col-md-4 input-right">
+          <label for="studentPhone">{{_("Teléfono avisos")}}</label>
+          <input class="form-control" id="studentPhone" name="studentPhone" {% if current_student %}value="{{current_student.phone}}"{% endif %}>
+        </div>
+      </div>
+      <div class="row ms-2 me-2">
+        <label for="studentAddress">{{_("Enderezo de residencia")}}</label>
+        <input class="form-control" id="studentAddress" name="studentAddress" {% if current_student %}value="{{current_student.address}}"{% endif %}>
+      </div>
+      <div class="row ms-2 me-2">
+        <!-- <label for="studentAllergies">{{_("Alerxias alimentarias")}}</label>
+        <input class="form-control" id="studentAllergies" name="studentAllergies" {% if current_student %}value="{{current_student.allergies}}"{% endif %}> -->
+
+        <input type="hidden" id="selectedIntolerancesIds" name="selectedIntolerancesIds">
+        <label for="selectedIntolerances">{{_("Alerxías/intolerancias")}}</label>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="showIntolerancesModal()"><i class="fa fa-cog"></i></button>
+            <input readonly class="form-control" id="selectedIntolerances" name="selectedIntolerances" {% if current_student %}value="{{current_student.get_intolerances_string()}}" {% endif %}>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="mb-3 mt-3">
+    <button type="button" class="btn btn-success w-100" onclick="saveStudent()">{{_("Gardar")}}</button>
+    <button type="button" class="btn btn-dark w-100" onclick="deleteStudent()" id="deleteStudentBtn" {% if not current_student %}style="display: none;"{% else %}style="display: block;"{% endif %}>{{_("Borrar")}}</button>
+    <button type="button" class="btn btn-primary w-100" onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+  </div>
+    {% include 'station/management/edit_intolerances_modal.html' %}
+</form>
+</div>
+
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+function changeChildish(){
+    let childish = document.getElementById("studentChildish").checked;
+    let text_selected = $("#studentClassroom option:selected" ).text();
+    console.log("Childish: ", childish);
+    if (childish){
+        $("#studentClassroom option:contains(EP)").prop("disabled", true);
+        $("#studentClassroom option:contains(EI)").prop("disabled", false);
+        if (!text_selected.includes("EI")){
+            $('#studentClassroom').val(0);
+        }
+    }
+    else{
+        $("#studentClassroom option:contains(EP)").prop("disabled", false);
+        $("#studentClassroom option:contains(EI)").prop("disabled", true);
+        if (!text_selected.includes("EP")){
+            $('#studentClassroom').val(0);
+        }
+    }
+}
+
+function showIntolerancesModal(){
+     $("#selectIntoleranceModal").show();
+}
+
+function validateStudent(){
+    removeErrors();
+
+    let res = true;
+
+    if ($("#studentName").val() === ""){
+        res = false;
+        showError("studentName", "Debe poñer un nome");
+    }
+
+    if ($("#studentSurname").val() === ""){
+        res = false;
+        showError("studentSurname", "Debe poñer un apelido");
+    }
+
+    if ($("#selectedSchool").val() === null){
+        res = false;
+        showError("selectedSchool", "Debe escoller un centro escolar");
+    }
+
+    if($("#studentBrother").val() === ""){
+        res = false;
+        showError("studentBrother", "Debe poñer o número de irmán");
+    }
+
+    if($("#numberID").val() === ""){
+        res = false;
+        showError("numberID", "Debe poñer algún valor único");
+    }
+
+    if($("#studentClassroom").val() == 0){
+        res = false;
+        showError("studentClassroom", "Debe escoller un curso");
+    }
+
+    return res;
+}
+
+function saveStudent(){
+    if (validateStudent()){
+        let e = document.getElementById("selectedStudent");
+        let studentId = e.options[e.selectedIndex].value;
+        if (studentId !== '0') {
+            let editUrl = "{{ url_for('student_bp.edit_student', student_id=0) }}".replace('/0', '/' + studentId);
+            document.forms['studentForm'].setAttribute('action', editUrl);
+        }
+        document.forms['studentForm'].submit();
+    }
+}
+
+function deleteStudent(){
+  let e = document.getElementById("selectedStudent");
+  let studentId = e.options[e.selectedIndex].value;
+  let deleteUrl = "{{ url_for('student_bp.delete_student', student_id=0) }}".replace('/0/', '/' + studentId + '/');
+  document.forms['studentForm'].setAttribute('action', deleteUrl);
+  document.forms['studentForm'].submit();
+}
+
+function changeStudent(){
+    removeErrors();
+  let e = document.getElementById("selectedStudent");
+  if(e.options[e.selectedIndex].value=='0'){
+    document.getElementById("studentName").value = '';
+    document.getElementById("studentSurname").value = '';
+    document.getElementById("studentClassroom").value = '0';
+    // If only one school, keep it selected; otherwise reset
+    var schoolSelect = document.getElementById("selectedSchool");
+    if (schoolSelect.options.length > 1) {
+      schoolSelect.value = '0';
+    } else if (schoolSelect.options.length === 1) {
+      schoolSelect.selectedIndex = 0;
+    }
+    //document.getElementById("studentNumber").value = '';
+    document.getElementById("numberID").value = '';
+    document.getElementById("studentPhone").value = '';
+    document.getElementById("studentBrother").value = '';
+    document.getElementById("studentMail").value = '';
+    document.getElementById("studentAddress").value = '';
+    //document.getElementById("studentAllergies").value = '';
+    document.getElementById("deleteStudentBtn").style.display="none";
+    document.getElementById("studentChildish").checked = false;
+    document.getElementById("studentBrother").value = '';
+    $("#selectedIntolerances").val("");
+    fillIntolerances([]);
+  }else{
+    document.getElementById("deleteStudentBtn").style.display="block";
+    loadStudent();
+  }
+}
+
+function loadStudent(){
+
+  let e = document.getElementById("selectedStudent");
+  let studentId = e.options[e.selectedIndex].value;
+  let baseUrl = "{{ url_for('student_bp.get_student', student_id=0) }}".replace('/0', '/' + studentId);
+  fetch(baseUrl, {
+    method: 'GET',
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    //console.log("Datos del estudiente: ", data_array);
+    document.getElementById("studentName").value = data_array.name;
+    if (data_array.childish === "on"){
+        document.getElementById("studentChildish").checked = true;
+    }
+    else{
+        document.getElementById("studentChildish").checked = false;
+    }
+
+    document.getElementById("studentBrother").value = data_array.brother_number;
+    document.getElementById("studentSurname").value = data_array.surname;
+    document.getElementById("studentClassroom").value = data_array.classroom;
+    document.getElementById("selectedSchool").value = data_array.school_id;
+    //document.getElementById("studentNumber").value = data_array.student_number;
+    document.getElementById("numberID").value = data_array.number_id;
+    document.getElementById("studentPhone").value = data_array.phone;
+    document.getElementById("studentMail").value = data_array.email;
+    document.getElementById("studentAddress").value = data_array.address;
+    //document.getElementById("studentAllergies").value = data_array.allergies;
+
+    //console.log("Intolerances: ", data_array.intolerances);
+    fillIntolerances(data_array.intolerance_ids);
+    closeIntoleranceModal();
+
+  });
+}
+
+function fillIntolerances(intolerances_array){
+    let controls = $('input[type="checkbox"][id^="selectedIntolerance"]');
+
+    for (let i = 0; i < controls.length; i++) {
+        let intolerance_id = controls[i].id.split("-")[1];
+        // intolerances_array puede ser lista de ints [1,3,5] o lista de objetos [{id:1,...}]
+        let selected = intolerances_array.some(function(item) {
+            let id = (typeof item === 'object') ? item["id"] : item;
+            return intolerance_id === id.toString();
+        });
+        $(controls[i]).prop('checked', selected);
+    }
+}
+
+function populateIntolerancesModal(intolerances_array){
+
+  let intolerances_string = '';
+  let intolerances_ids = [];
+  let template = document.querySelector('#intolerance-template');
+  let area = document.querySelector('#selectIntoleranceModalBody');
+  area.innerHTML = '';
+  for (let i = 0; i < intolerances_array.length; i++) {
+    let html_msg = getHtmlIntolerance(template, intolerances_array[i]);
+    // Append template to dom
+    area.appendChild(html_msg);
+    if(intolerances_array[i]["is_selected"]==1){
+      if(intolerances_string.length > 0){
+        intolerances_string = intolerances_string.concat(', ')
+      }
+      intolerances_string = intolerances_string.concat(intolerances_array[i]["description"])
+      intolerances_ids.push(intolerances_array[i]["id"]);
+    }
+  }
+  //document.getElementById("selectedIntolerances").value = intolerances_string;
+  //document.getElementById("selectedIntolerancesIds").value = intolerances_ids;
+  //console.log("Carga los intolerances ids: ", intolerances_ids);
+}
+
+function getHtmlIntolerance(template, itemData){
+
+    // Clone the HTML template
+    let template_clone = template.content.cloneNode(true);
+
+    // Query & update the template content
+    if(itemData["is_selected"]==1){
+      template_clone.getElementById("selectedIntolerance").checked = true;
+    }
+    template_clone.getElementById('labelIntolerance').setAttribute('for', 'selectedIntolerance-'+itemData["id"]);
+    template_clone.getElementById('selectedIntolerance').setAttribute('name', 'selectedIntolerance-'+itemData["id"]);
+    template_clone.getElementById('labelIntolerance').innerHTML = itemData["description"];
+    template_clone.getElementById('selectedIntolerance').id = 'selectedIntolerance-'+itemData["id"];
+
+    return template_clone;
+}
+
+function closeIntoleranceModal(){
+    let intolerances_string = '';
+    let intolerances_ids = [];
+    $(".selected-intolerance-group ").each(function() {
+        if($(this).find('input[type="checkbox"]').is(':checked')){
+            if(intolerances_string.length > 0){
+                intolerances_string = intolerances_string.concat(', ')
+            }
+            intolerances_string = intolerances_string.concat($(this).children('label').text());
+            intolerances_ids.push($(this).find('input').attr('id').split("-")[1]);
+        }
+    });
+    document.getElementById("selectedIntolerances").value = intolerances_string;
+    document.getElementById("selectedIntolerancesIds").value = intolerances_ids;
+    //console.log("Intolerances_ids: ", intolerances_ids);
+    $('#selectIntoleranceModal').hide();
+}
+
+ </script>
+{% endblock js_script%}
+
+{% block cur_navlink %}'nav-link-manage-students'{% endblock cur_navlink%}

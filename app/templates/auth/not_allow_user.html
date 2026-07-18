@@ -1,0 +1,15 @@
+{% extends 'common/layout.html' %}
+{% block body %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-2 text-center">
+      <p><i class="fa fa-exclamation-triangle fa-5x"></i><br/>Status Code: 403</p>
+    </div>
+    <div class="col-md-10">
+      <h3>{{ _("Non permitido") }}</h3>
+      <p>{{ _("O seu usuario non ten permitido ver a información solicitada") }}</p>
+      <a class="btn btn-danger" href="javascript:history.back()">{{ _("Ir atrás") }}</a>
+    </div>
+  </div>
+</div>
+{% endblock body %}

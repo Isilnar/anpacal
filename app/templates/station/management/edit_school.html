@@ -1,0 +1,127 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+<form id="careCenterForm" action="{{ url_for('school_bp.list_schools') }}" method="POST" style="width:100%;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <div class="row">
+    <div class="mb-3 col-md-4 wrapper">
+      <label for="selectedCenter">{{_("Listaxe de centros")}}</label>
+      <select size="10" class="form-select selection" id="selectedCenter" name="selectedCenter" onchange="changeCenter()">
+        <option value=0 {% if not current_center %}selected{% endif %}>{{_("Novo centro")}}</option>
+        {% for center in centers_list %}
+        <option value={{center.id}} {%if current_center and current_center.id==center.id %}selected{% endif %}>{{center.name}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3 col-md-8">
+      <div class="row ms-2 me-2">
+        <div class="col-md-8" style="padding-left:0px">
+          <label for="centerName">{{_("Nome do centro")}}</label>
+          <input class="form-control" id="centerName" name="centerName" {% if current_center %}value="{{current_center.name}}"{% endif %}>
+        </div>
+        <div class="col-md-4" style="padding-right:0px">
+          <label for="centerPhone">{{_("Teléfono")}}</label>
+          <input class="form-control" id="centerPhone" name="centerPhone" {% if current_center %}value="{{current_center.phone}}"{% endif %}>
+        </div>
+      </div>
+      <div class="row ms-2 me-2">
+        <label for="centerMail">{{_("Correo Electrónico")}}</label>
+        <input class="form-control" id="centerMail" name="centerMail" {% if current_center %}value="{{current_center.email}}"{% endif %}>
+      </div>
+      <div class="row ms-2 me-2">
+        <label for="centerAddress">{{_("Enderezo")}}</label>
+        <input class="form-control" id="centerAddress" name="centerAddress" {% if current_center %}value="{{current_center.address}}"{% endif %}>
+      </div>
+    </div>
+  </div>
+  <div class="mb-3 mt-3">
+    <button type="button" class="btn btn-success w-100" onclick="saveCenter()">{{_("Gardar")}}</button>
+    <button type="button" class="btn btn-dark w-100" onclick="deleteCenter()" id="deleteCenterBtn" {% if not current_center %}style="display: none;"{% else %}style="display: block;"{% endif %}>{{_("Borrar")}}</button>
+    <button type="button" class="btn btn-primary w-100" onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+  </div>
+</form>
+</div>
+
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+function validateSchool(){
+    removeErrors();
+    let res = true;
+
+    if ($("#centerName").val() === ""){
+        res = false;
+        showError("centerName", "Debe poñer un nome");
+    }
+
+    return res;
+}
+
+function saveCenter(){
+    if (validateSchool()){
+        let e = document.getElementById("selectedCenter");
+        let centerId = e.options[e.selectedIndex].value;
+        if (centerId !== '0') {
+            let editUrl = "{{ url_for('school_bp.edit_school', school_id=0) }}".replace('/0', '/' + centerId);
+            document.forms['careCenterForm'].setAttribute('action', editUrl);
+        }
+        document.forms['careCenterForm'].submit();
+    }
+}
+
+function deleteCenter(){
+  let e = document.getElementById("selectedCenter");
+  let centerId = e.options[e.selectedIndex].value;
+  let deleteUrl = "{{ url_for('school_bp.delete_school', school_id=0) }}".replace('/0/', '/' + centerId + '/');
+  document.forms['careCenterForm'].setAttribute('action', deleteUrl);
+  document.forms['careCenterForm'].submit();
+}
+
+function changeCenter(){
+    removeErrors();
+  let e = document.getElementById("selectedCenter");
+  if(e.options[e.selectedIndex].value=='0'){
+    document.getElementById("centerName").value = '';
+    document.getElementById("centerPhone").value = '';
+    document.getElementById("centerMail").value = '';
+    document.getElementById("centerAddress").value = '';
+    document.getElementById("deleteCenterBtn").style.display="none";
+  }else{
+    document.getElementById("deleteCenterBtn").style.display="block";
+    loadCenter();
+  }
+}
+
+function loadCenter(){
+
+  let e = document.getElementById("selectedCenter");
+  let centerId = e.options[e.selectedIndex].value;
+  let baseUrl = "{{ url_for('school_bp.get_school', school_id=0) }}".replace('/0', '/' + centerId);
+  fetch(baseUrl, {
+    method: 'GET',
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+
+    document.getElementById("centerName").value = data_array.name;
+    document.getElementById("centerPhone").value = data_array.phone;
+    document.getElementById("centerMail").value = data_array.email;
+    document.getElementById("centerAddress").value = data_array.address;
+    // console.log(data_array);
+  });
+}
+ </script>
+{% endblock js_script%}
+
+{% block cur_navlink %}'nav-link-manage-schools'{% endblock cur_navlink%}

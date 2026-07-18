@@ -1,0 +1,51 @@
+<div class="modal" id="searchChatModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action={% block modal_search_form %}"/"{% endblock modal_search_form %} method="POST">
+      <!-- Modal Header -->
+      <!--
+      <div class="modal-header">
+        <h4 class="modal-title">Busca</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      -->
+      <!-- Modal body -->
+      <div class="modal-body container-fluid">
+          <div class="d-flex flex-row align-items-start mb-3">
+              <label for="search-from-date" class="p-2 col-form-label">{{_("Dende")}}</label>
+              <div class="col-p-10">
+                <div class="input-group date" id="search-from-date" name="search-from-date" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" name="search-from-date-value" data-target="#search-from-date" data-input/>
+                  <div class="input-group-append" data-target="#search-from-date" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="d-flex flex-row align-items-start mb-3">
+            <label for="search-to-date" class="p-2 col-form-label">{{_("Ata")}}</label>
+            <div class="col-p-10">
+              <div class="input-group date" id="search-to-date" data-target-input="nearest">
+                 <input type="text" class="form-control datetimepicker-input" name="search-to-date-value" data-target="#search-to-date" data-input/>
+                 <div class="input-group-append" data-target="#search-to-date" data-toggle="datetimepicker">
+                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        <div class="mb-3 has-search">
+          <span class="fa fa-search form-control-feedback"></span>
+          <input type="text" class="form-control" id="search-keywords" name="search-keywords" placeholder="{{_("Procura palabras clave")}}">
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <input id="customerId" name="customerId" type="hidden" value="{{customer.id}}">
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">{{_("Aceptar")}}</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">{{_("Cancelar")}}</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>

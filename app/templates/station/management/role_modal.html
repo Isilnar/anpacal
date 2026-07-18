@@ -1,0 +1,45 @@
+<div class="modal" id="selectRoleModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- template schema, hidden from the dom -->
+      <template id="role-template">
+        <!-- template content -->
+        <div class="mb-3 row selected-role-group">
+          <label class="col-8 col-form-label" id="labelRole"></label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedRole" type="checkbox" class="primary">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+      </template>
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+        <h4 class="modal-title">{{_("Escoller roles do usuario")}}</h4>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid" id="selectRoleModalBody">
+        {% for r in roles_list %}
+        <div class="mb-3 row selected-role-group">
+          <label for="selectedRole-{{r.id}}" class="col-8 col-form-label">{{r.description}}</label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input type="checkbox" id="selectedRole-{{r.id}}" name="selectedRole-{{r.id}}" class="primary" {%if r.is_selected and r.is_selected==1 %}checked{%endif%}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeRoleModal()">{{_("Pechar")}}</button>
+      </div>
+    </div>
+  </div>
+</div>

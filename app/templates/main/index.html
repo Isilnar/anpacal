@@ -1,0 +1,153 @@
+{% extends 'common/layout.html' %}
+
+{% block body %}
+    {% include 'station/management/edit_password_modal.html' %}
+
+    {% if current_user.is_authenticated %}
+
+    <section id="menu">
+      <div class="btn-group-vertical btn-group-justified d-flex p-3">
+        {% if current_user.is_admin() %}
+          <button class="btn btn-secondary btn-lg manage-schools-button" onclick="location.href='{{url_for('school_bp.list_schools')}}';"><i class="fa fa-book"></i> {{_("Xestión de centros")}}</button>
+          <button class="btn btn-danger btn-lg manage-students-button" onclick="location.href='{{url_for('student_bp.list_students')}}';"><i class="fa fa-graduation-cap"></i> {{_("Xestión de alumnos")}}</button>
+          <button class="btn btn-success btn-lg manage-users-button" onclick="location.href='{{url_for('user_bp.list_users')}}';"><i class="fa fa-address-card-o"></i> {{_("Xestión de usuarios")}}</button>
+          <button class="btn btn-primary btn-lg manage-reports-button" onclick="location.href='{{url_for('reports_bp.management_reports')}}';"><i class="fa fa-pie-chart"></i> {{_("Xeración de informes")}}</button>
+          <button class="btn btn-warning btn-lg manage-edit-button" onclick="location.href='{{url_for('edit_registers_bp.management_edit')}}';"><i class="fa fa-retweet"></i> {{_("Engadir/modificar rexistros")}}</button>
+          <button class="btn btn-success btn-lg manage-holydays-button" onclick="location.href='{{url_for('holyday_bp.list_holydays')}}';"><i class="fa fa-beer"></i> {{_("Xestión de festivos")}}</button>
+          <button class="btn btn-secondary btn-lg manage-schools-button" onclick="location.href='{{url_for('menu_bp.get_menu')}}';"><i class="fa fa-cutlery"></i> {{_("Xestión de ligazón do menú")}}</button>
+        {% endif %}
+        {% if current_user.is_family()%}
+            <button class="btn btn-primary btn-lg manage-calendar-button" onclick="location.href='{{url_for('calendar_station.management_calendar')}}';"><i class="fa fa-calendar"></i> {{_("Xestión de calendario escolar")}}</button>
+        {% endif %}
+        {% if current_user.is_lunchcare()%}
+            <button class="btn btn-success btn-lg manage-lunchcare-calendar-button" onclick="location.href='{{url_for('calendar_station.management_lunchcare_calendar')}}';"><i class="fa fa-calendar"></i> {{_("Xestión de calendario comedor")}}</button>
+            <button class="btn btn-primary btn-lg manage-lunchcare-reports-button" onclick="location.href='{{url_for('lunchcare_reports_bp.management_lunchcare_reports')}}';"><i class="fa fa-pie-chart"></i> {{_("Xeración de informes")}}</button>
+        {% endif %}
+        {% if current_user.is_earlycare()%}
+            <button class="btn btn-success btn-lg manage-early-calendar-button" onclick="location.href='{{url_for('calendar_station.management_earlycare_calendar')}}';"><i class="fa fa-calendar"></i> {{_("Xestión de calendario madrugadores")}}</button>
+            <button class="btn btn-primary btn-lg manage-early-reports-button" onclick="location.href='{{url_for('earlycare_reports_bp.management_earlycare_reports')}}';"><i class="fa fa-pie-chart"></i> {{_("Xeración de informes")}}</button>
+        {% endif %}
+        {% if current_user.is_family() or current_user.is_lunchcare() or current_user.is_earlycare() %}
+            <button class="btn btn-secondary btn-lg" onclick="showChangePassword({{ current_user.id }});"><i class="fa fa-key"></i> {{_("Modificar contrasinal")}}</button>
+        {% endif %}
+        <button class="btn btn-warning btn-lg manage-menu-button" onclick="window.open('{{ menu_link }}','_blank');"><i class="fa fa-cutlery"></i> {{_("Menú actual")}}</button>
+      </div>
+    </section>
+    {% else %}
+    <div class="wrap-login">
+    <form class="form-signin text-center mt-3" action="/login" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <img class="mb-4" src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="72" height="72">
+      <h3 class="h3 mb-3 font-weight-normal">{{_("Aplicación de xestión")}}</h3>
+      <h3 class="h3 mb-3 font-weight-normal">{{_("de madrugadores e comedor")}}</h3>
+      <label for="username" class="visually-hidden">{{_("Usuario")}}</label>
+      <input type="text" id="username" name="username" class="form-control" placeholder="Nome de usuario" required autofocus>
+      <label for="password" class="visually-hidden">{{_("Contrasinal")}}</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Contrasinal" required>
+      <div class="checkbox mb-3">
+        <label></label>
+      </div>
+      <button class="btn btn-lg btn-success w-100" type="submit">{{_("Entrar")}}</button>
+      <p class="mt-3 mb-3 text-muted">{{ config['COPYRIGHT_TEXT'] }}</p>
+    </form>
+    </div>
+    {% endif %}
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+    const MSG_PASS_CURRENT_REQUIRED = "{{ _('Debe especificar o contrasinal actual') }}";
+    const MSG_PASS_NEW_REQUIRED = "{{ _('Debe especificar o novo contrasinal') }}";
+    const MSG_PASS_CONFIRM_REQUIRED = "{{ _('Debe confirmar o novo contrasinal') }}";
+    const MSG_PASS_MISMATCH = "{{ _('Non coincide a nova contrasinal coa confirmación') }}";
+    const MSG_PASS_WRONG = "{{ _('O contrasinal actual non é correcto') }}";
+
+    function showChangePassword(userId){
+        removeErrors();
+        console.log("Entra en cambiar password con usuario ", userId);
+        $("#changePasswordIdModal").val(userId);
+        $("#editPasswordModal").show();
+    }
+
+    function closePasswordModal(){
+        removeErrors();
+        $("#editPasswordModal").hide();
+    }
+
+    function validatePasswordModal(){
+        let res = true;
+        removeErrors();
+        let userPassNew = $("#userPassNew").val();
+        let userPassNew1 = $("#userPassNew1").val();
+
+        if ($("#userPassNow").val() === ""){
+            res = false;
+            showError("userPassNow", MSG_PASS_CURRENT_REQUIRED);
+        }
+
+        if (userPassNew === ""){
+            res = false;
+            showError("userPassNew", MSG_PASS_NEW_REQUIRED);
+        }
+
+        if (userPassNew1 === ""){
+            res = false;
+            showError("userPassNew1", MSG_PASS_CONFIRM_REQUIRED);
+        }
+
+        if (userPassNew !== userPassNew1){
+            res = false;
+            showError("editPasswordModalBody", MSG_PASS_MISMATCH);
+        }
+
+        return res;
+    }
+
+    function changePasswordModal(){
+        if (validatePasswordModal()){
+
+            let userId = $("#changePasswordIdModal").val();
+            let passwordOld = $("#userPassNow").val();
+            let passwordNew = $("#userPassNew").val();
+            let passwordNew1 = $("#userPassNew1").val();
+
+            let data_request = {"userId": userId, "passwordOld": passwordOld, "passwordNew": passwordNew,
+                                "passwordNew1": passwordNew1};
+
+            fetch("{{ url_for('user_bp.password_change_user') }}", {
+              method: 'POST', // or 'PUT'
+              body: JSON.stringify(data_request), // data can be `string` or {object}!
+              headers:{
+                'Content-Type': 'application/json'
+              }
+            }).then(function(response) {
+              return response.json();
+            }).then(function(data_array) {
+                if (data_array["success"]){
+                    closePasswordModal();
+                    window.location = document.getElementById('appLogOut').href;
+                }
+                else{
+                    showError("editPasswordModalBody", MSG_PASS_WRONG);
+                }
+            });
+        }
+    }
+
+    // Auto-open password modal if redirected from navbar
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('change_password') === '1') {
+            showChangePassword({{ current_user.id }});
+            // Clean URL without reload
+            history.replaceState(null, '', window.location.pathname);
+        }
+    })();
+
+</script>
+{% endblock js_script%}
+
+{% block install_area %}
+<button class="install-button"><i class="fa fa-arrow-circle-o-down"></i>Instalar</button>
+{% endblock install_area %}

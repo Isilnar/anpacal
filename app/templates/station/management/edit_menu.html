@@ -1,0 +1,58 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+    <label for="menu_link">{{_("Ligazón do menú")}}</label>
+    <input class="form-control" id="menu_link" name="menu_link" value="{{menu_link}}">
+
+    <div class="mb-3 mt-3">
+        <button type="button" class="btn btn-success w-100" onclick="saveMenu()">{{_("Gardar")}}</button>
+        <button type="button" class="btn btn-primary w-100" onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+    </div>
+</div>
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+    function saveMenu(){
+        if (validateMenu()){
+            let form1 = document.createElement("form");
+            form1.setAttribute("id", "formMenu");
+            form1.setAttribute("method", "POST");
+            form1.setAttribute("action", "{{url_for('menu_bp.set_menu')}}");
+
+            let input1 = document.createElement("input");
+            input1.setAttribute("id", "menu_link");
+            input1.setAttribute("type", "text");
+            input1.setAttribute("name", "menu_link");
+            input1.setAttribute("value", $("#menu_link").val());
+            input1.setAttribute("style", "display:none;");
+
+            form1.appendChild(input1);
+            form1.appendChild(csrfInput());
+            document.body.appendChild(form1);
+            form1.submit();
+        }
+    }
+
+    function validateMenu(){
+        removeErrors();
+        let res = true;
+
+        if ($("#menu_link").val() == ""){
+            res = false;
+            showError("menu_link", "Debe poñer unha ligazón");
+        }
+
+        return res;
+    }
+
+ </script>
+{% endblock js_script%}
+
+{% block cur_navlink %}'nav-link-manage-menu'{% endblock cur_navlink%}

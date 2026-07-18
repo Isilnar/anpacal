@@ -1,0 +1,210 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-calendar.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+    <div id='calendar' class="mt-1 mb-1"></div>
+    {% include 'station/calendar/lunchcare_calendar_modal.html' %}
+{% endblock body %}
+
+{% block cur_navlink %}'nav-link-manage-lunchcare-calendar'{% endblock cur_navlink%}
+
+{% block js_script %}
+<script type="text/javascript">
+    $(function () {
+        flatpickr('#set-to-date', {
+            wrap: true,
+            locale: window.FLATPICKR_LOCALE,
+            dateFormat: 'd/m/Y',
+            defaultDate: new Date(),
+            disable: [
+                function(date) { return date.getDay() === 0 || date.getDay() === 6; }
+            ]
+        });
+    });
+</script>
+<script>
+
+var STATIC_IMAGES = "{{ url_for('static', filename='images/') }}";
+var fullCalendar;
+
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: '{{ get_locale() }}',
+
+    views: {
+      month: {
+        titleFormat: 'MMMM [de] YYYY'
+      }
+    },
+
+    headerToolbar:{
+        left:'title',
+        right:'prev,today,next'
+    },
+
+  dayHeaderFormat:{
+      weekday: 'long'
+  },
+
+    //initialView: 'dayGridMonth',
+    //selectable: true,
+    weekends: false,
+    initialDate: '{{current_start_date}}',
+    height: 'auto',
+    contentHeight: 48,
+    eventColor: 'transparent',
+    validRange: {start: '{{current_start_date}}'},
+    dateClick: function(info) {
+        select_event(info.dateStr);
+    },
+    eventClick: function(info) {
+        select_event(info.event.startStr);
+    },
+    //select: function(info) {
+	//	alert('selected ' + info.startStr + ' to ' + info.endStr);
+    //},
+
+  });
+
+  calendar.render();
+  fullCalendar = calendar;
+});
+
+function select_event(data){
+    console.log('clicked event ' + data);
+    load_event(data);
+};
+
+function load_event(event_date){
+
+  let data_request = {current_event_date: event_date, center_id: {{current_school.id}},};
+  fetch('load_lunchcare_calendar_event', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data_request), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    console.log("Retorno: ", data_array);
+    $("#calendarInterval").text(data_array.locale_date);
+    $("#lunchcare-madrugadores-almuerzo").text(data_array.lunchcare_almuerzo);
+    $("#lunchcare-comedor").text(data_array.lunchcare_comedor);
+    $("#almorzo-infantil").text(data_array.almorzo_infantil);
+    $("#almorzo-primaria").text(data_array.almorzo_primaria);
+    $("#comedor-infantil").text(data_array.comedor_infantil);
+    $("#comedor-primaria").text(data_array.comedor_primaria);
+    $("#lunchcare-comedor-intolerances").text(data_array.lunchcare_comedor_intolerances);
+    $("#lunchcare-madrugadores-almuerzo-intolerances").text(data_array.lunchcare_almuerzo_intolerances);
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('selectLunchCareCalendarModal')).show();
+  });
+};
+
+function save_event(){
+
+  let from_date = document.getElementById("set-from-date-value").value;
+  let to_date = $('#set-to-date-value').val();
+  let early_data = $('[id^="selectedEarly"]');
+  let early_request = {};
+  for (let i = 0; i < early_data.length; i++) {
+      let student_id = early_data[i].id.split("-")[1];
+      early_request[student_id] = 0;
+      if (early_data[i].checked === true){
+          early_request[student_id] = 1;
+      }
+  }
+
+  let lunch_data = $('[id^="selectedLunch"]');
+  let lunch_request = {};
+  for (let i = 0; i < lunch_data.length; i++) {
+      let student_id = lunch_data[i].id.split("-")[1];
+      lunch_request[student_id] = 0;
+      if (lunch_data[i].checked == true){
+          lunch_request[student_id] = 1;
+      }
+  }
+
+  var data_request = {current_from_date: from_date, current_to_date: to_date,
+                      current_early_request: early_request,
+                      current_lunch_request: lunch_request};
+  fetch('save_calendar_event', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data_request), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    for(i=0;i<data_array.event_dates.length;i++){
+        var oldEvent = fullCalendar.getEventById(data_array.event_dates[i].id);
+        if(oldEvent == null){
+            fullCalendar.addEvent({
+                id: data_array.event_dates[i].id,
+                start: data_array.event_dates[i].start,
+                customHtml: '<div style="text-align: center;"><img src="'+STATIC_IMAGES+data_array.event_type+'.png" style="width:100%;max-width:96px;height:auto"></div>'
+              });
+        }else{
+            if(data_array.event_type === null){
+                oldEvent.remove();
+            }else{
+                oldEvent.setExtendedProp('customHtml','<div style="text-align: center;"><img src="'+STATIC_IMAGES+data_array.event_type+'.png" style="width:100%;max-width:96px;height:auto"></div>');
+            }
+        }
+    }
+    fullCalendar.render()
+  });
+};
+
+function acceptEvents(){
+    //save_event();
+    bootstrap.Modal.getInstance(document.getElementById('selectLunchCareCalendarModal'))?.hide();
+};
+
+function cancelEvents(){
+    bootstrap.Modal.getInstance(document.getElementById('selectLunchCareCalendarModal'))?.hide();
+};
+
+function populateCalendarModal(students_array){
+
+  let template = document.querySelector('#event-template');
+  let area = document.querySelector('#selectLunchCareCalendarModalStudentsSection');
+  area.innerHTML = '';
+  for (let i = 0; i < students_array.length; i++) {
+    let html_msg = getHtmlStudent(template, students_array[i]);
+    // Append template to dom
+    area.appendChild(html_msg);
+  }
+}
+
+function getHtmlStudent(template, itemData){
+
+    // Clone the HTML template
+    let template_clone = template.content.cloneNode(true);
+
+    // Query & update the template content
+    template_clone.getElementById("labelStudentName").innerHTML = '<b>'+itemData["fullname"]+'</b>';
+    if(itemData.early === 1){
+        template_clone.getElementById('selectedEarly').checked = true;
+    }else{
+        template_clone.getElementById('selectedEarly').checked = false;
+    }
+    template_clone.getElementById('selectedEarly').id = 'selectedEarly-'+itemData["id"];
+    if(itemData.lunch === 1){
+        template_clone.getElementById('selectedLunch').checked = true;
+    }else{
+        template_clone.getElementById('selectedLunch').checked = false;
+    }
+    template_clone.getElementById('selectedLunch').id = 'selectedLunch-'+itemData["id"];
+
+    return template_clone;
+}
+</script>
+
+{% endblock js_script %}

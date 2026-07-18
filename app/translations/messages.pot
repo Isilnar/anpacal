@@ -1,0 +1,567 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-12 23:10+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/templates/auth/login.html:22
+msgid "Usuario:"
+msgstr ""
+
+#: app/templates/auth/login.html:23
+msgid "Nome de usuario"
+msgstr ""
+
+#: app/templates/auth/login.html:28
+msgid "Contrasinal:"
+msgstr ""
+
+#: app/templates/auth/login.html:29 app/templates/main/index.html:44
+#: app/templates/station/management/edit_user.html:76
+msgid "Contrasinal"
+msgstr ""
+
+#: app/templates/auth/login.html:33 app/templates/common/navbar.html:86
+msgid "Comezar sesión"
+msgstr ""
+
+#: app/templates/auth/not_allow_user.html:9
+msgid "Non permitido"
+msgstr ""
+
+#: app/templates/auth/not_allow_user.html:10
+msgid "O seu usuario non ten permitido ver a información solicitada"
+msgstr ""
+
+#: app/templates/auth/not_allow_user.html:11
+msgid "Ir atrás"
+msgstr ""
+
+#: app/templates/common/layout.html:71
+msgid "A aplicación non está en liña. Por favor, comprobe a su conexión."
+msgstr ""
+
+#: app/templates/common/layout.html:72
+msgid "Permitir notificacións"
+msgstr ""
+
+#: app/templates/common/layout.html:80
+msgid "Instalar"
+msgstr ""
+
+#: app/templates/common/navbar.html:18 app/templates/main/index.html:11
+msgid "Xestión de centros"
+msgstr ""
+
+#: app/templates/common/navbar.html:21 app/templates/main/index.html:12
+msgid "Xestión de alumnos"
+msgstr ""
+
+#: app/templates/common/navbar.html:24 app/templates/main/index.html:13
+msgid "Xestión de usuarios"
+msgstr ""
+
+#: app/templates/common/navbar.html:27 app/templates/main/index.html:14
+#: app/templates/main/index.html:24 app/templates/main/index.html:28
+msgid "Xeración de informes"
+msgstr ""
+
+#: app/templates/common/navbar.html:30 app/templates/main/index.html:15
+msgid "Engadir/modificar rexistros"
+msgstr ""
+
+#: app/templates/station/management/edit_registers.html:235
+msgid "Engadir rexistro"
+msgstr ""
+
+#: app/templates/common/navbar.html:33 app/templates/main/index.html:16
+msgid "Xestión de festivos"
+msgstr ""
+
+#: app/templates/common/navbar.html:36
+msgid "Xestión de menú"
+msgstr ""
+
+#: app/templates/common/navbar.html:41
+msgid "Menú"
+msgstr ""
+
+#: app/templates/common/navbar.html:44
+msgid "Xestión de calendario"
+msgstr ""
+
+#: app/templates/common/navbar.html:49 app/templates/main/index.html:31
+#: app/templates/station/management/edit_password_modal.html:7
+#: app/templates/station/management/edit_password_modal.html:29
+msgid "Modificar contrasinal"
+msgstr ""
+
+#: app/templates/common/navbar.html:69
+msgid "Pechar sesión"
+msgstr ""
+
+#: app/templates/common/search_modal.html:15
+#: app/templates/station/management/edit_registers.html:54
+#: app/templates/station/management/get_earlycare_reports.html:12
+#: app/templates/station/management/get_reports.html:35
+msgid "Dende"
+msgstr ""
+
+#: app/templates/common/search_modal.html:26
+#: app/templates/station/calendar/calendar_modal.html:44
+#: app/templates/station/chat/search_modal.html:26
+#: app/templates/station/management/edit_registers.html:65
+#: app/templates/station/management/get_earlycare_reports.html:23
+#: app/templates/station/management/get_reports.html:46
+msgid "Ata"
+msgstr ""
+
+#: app/templates/common/search_modal.html:38
+msgid "Procura palabras clave"
+msgstr ""
+
+#: app/templates/common/search_modal.html:45
+#: app/templates/station/calendar/calendar_modal.html:61
+#: app/templates/station/calendar/earlycare_calendar_modal.html:34
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:34
+#: app/templates/station/chat/search_modal.html:45
+msgid "Aceptar"
+msgstr ""
+
+#: app/templates/common/search_modal.html:46
+#: app/templates/station/calendar/calendar_modal.html:62
+#: app/templates/station/calendar/earlycare_calendar_modal.html:35
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:35
+#: app/templates/station/chat/search_modal.html:46
+msgid "Cancelar"
+msgstr ""
+
+#: app/templates/common/socket_js.html:18
+msgid "Mensaxe na sala de "
+msgstr ""
+
+#: app/templates/common/socket_js.html:19
+msgid " escribiu: "
+msgstr ""
+
+#: app/templates/common/socket_js.html:31
+#: app/templates/station/chat/chat.html:204
+msgid "Aviso de "
+msgstr ""
+
+#: app/templates/common/socket_js.html:34
+#: app/templates/station/chat/chat.html:207
+msgid "Información de comentarios y material"
+msgstr ""
+
+#: app/templates/common/socket_js.html:36
+#: app/templates/station/chat/chat.html:209
+msgid "Información acerca de estado de salud"
+msgstr ""
+
+#: app/templates/common/socket_js.html:38
+#: app/templates/station/chat/chat.html:211
+msgid "Información acerca de transporte"
+msgstr ""
+
+#: app/templates/main/index.html:17
+msgid "Xestión de ligazón do menú"
+msgstr ""
+
+#: app/templates/main/index.html:20
+msgid "Xestión de calendario escolar"
+msgstr ""
+
+#: app/templates/main/index.html:23
+msgid "Xestión de calendario comedor"
+msgstr ""
+
+#: app/templates/main/index.html:27
+msgid "Xestión de calendario madrugadores"
+msgstr ""
+
+#: app/templates/main/index.html:33
+msgid "Menú actual"
+msgstr ""
+
+#: app/templates/main/index.html:40
+msgid "Aplicación de xestión"
+msgstr ""
+
+#: app/templates/main/index.html:41
+msgid "de madrugadores e comedor"
+msgstr ""
+
+#: app/templates/main/index.html:42
+#: app/templates/station/management/edit_registers.html:43
+msgid "Usuario"
+msgstr ""
+
+#: app/templates/main/index.html:49
+msgid "Entrar"
+msgstr ""
+
+#: app/templates/main/offline.html:8
+msgid "Erro de conexión"
+msgstr ""
+
+#: app/templates/main/offline.html:9
+msgid "Parece que non se pode conectar ao servidor... Perdón polas molestias!"
+msgstr ""
+
+#: app/templates/main/offline.html:10
+msgid ""
+"Agarde uns intres e se o problema persiste, póñase en contacto co seu "
+"centro de referencia"
+msgstr ""
+
+#: app/templates/main/offline.html:11
+msgid "Intentar cargar de novo a aplicación"
+msgstr ""
+
+#: app/templates/station/calendar/calendar_list.html:15
+msgid "Calendario de alumnos en "
+msgstr ""
+
+#: app/templates/station/calendar/calendar_modal.html:10
+#: app/templates/station/management/edit_register_modal.html:19
+#: app/templates/station/management/edit_registers.html:26
+#: app/templates/station/management/get_reports.html:18
+msgid "Madrugadores con almorzo"
+msgstr ""
+
+#: app/templates/station/calendar/calendar_modal.html:18
+msgid "Madrugadores sin almorzo"
+msgstr ""
+
+#: app/templates/station/calendar/calendar_modal.html:26
+#: app/templates/station/management/edit_register_modal.html:20
+#: app/templates/station/management/edit_registers.html:27
+#: app/templates/station/management/get_reports.html:19
+msgid "Comedor"
+msgstr ""
+
+#: app/templates/station/calendar/earlycare_calendar_modal.html:15
+#: app/templates/station/calendar/earlycare_calendar_modal.html:25
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:15
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:25
+#: app/templates/station/management/edit_student.html:33
+msgid "Infantil"
+msgstr ""
+
+#: app/templates/station/calendar/earlycare_calendar_modal.html:16
+#: app/templates/station/calendar/earlycare_calendar_modal.html:26
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:16
+#: app/templates/station/calendar/lunchcare_calendar_modal.html:26
+msgid "Primaria"
+msgstr ""
+
+#: app/templates/station/chat/chat.html:49
+msgid "Añada su texto aqui..."
+msgstr ""
+
+#: app/templates/station/chat/chat.html:196
+msgid "Mensaje en sala de "
+msgstr ""
+
+#: app/templates/station/chat/chat.html:197
+msgid " ha escrito: "
+msgstr ""
+
+#: app/templates/station/chat/chat_list.html:17
+msgid "Mensajes sin leer"
+msgstr ""
+
+#: app/templates/station/chat/search_modal.html:15
+msgid "Desde"
+msgstr ""
+
+#: app/templates/station/chat/search_modal.html:38
+msgid "Busca palabras clave"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:12
+msgid "Listaxe de festivos"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:14
+msgid "Novo festivo"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:23
+msgid "Data festivo"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:35
+#: app/templates/station/management/edit_menu.html:13
+#: app/templates/station/management/edit_register_modal.html:75
+#: app/templates/station/management/edit_school.html:43
+#: app/templates/station/management/edit_student.html:101
+#: app/templates/station/management/edit_user.html:105
+msgid "Gardar"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:36
+#: app/templates/station/management/edit_school.html:44
+#: app/templates/station/management/edit_student.html:102
+#: app/templates/station/management/edit_user.html:110
+msgid "Borrar"
+msgstr ""
+
+#: app/templates/station/management/edit_holydays.html:37
+#: app/templates/station/management/edit_menu.html:14
+#: app/templates/station/management/edit_password_modal.html:30
+#: app/templates/station/management/edit_register_modal.html:76
+#: app/templates/station/management/edit_registers.html:83
+#: app/templates/station/management/edit_school.html:45
+#: app/templates/station/management/edit_student.html:103
+#: app/templates/station/management/edit_user.html:113
+#: app/templates/station/management/get_earlycare_reports.html:36
+#: app/templates/station/management/get_lunchcare_reports.html:28
+#: app/templates/station/management/get_reports.html:58
+msgid "Saír"
+msgstr ""
+
+#: app/templates/station/management/edit_intolerances_modal.html:22
+msgid "Escoller alerxías/intolerancias do alumno"
+msgstr ""
+
+#: app/templates/station/management/edit_intolerances_modal.html:41
+#: app/templates/station/management/role_modal.html:41
+#: app/templates/station/management/school_modal.html:41
+#: app/templates/station/management/student_modal.html:39
+msgid "Pechar"
+msgstr ""
+
+#: app/templates/station/management/edit_menu.html:9
+msgid "Ligazón do menú"
+msgstr ""
+
+#: app/templates/station/management/edit_password_modal.html:14
+msgid "Contrasinal actual"
+msgstr ""
+
+#: app/templates/station/management/edit_password_modal.html:18
+msgid "Nova Contrasinal"
+msgstr ""
+
+#: app/templates/station/management/edit_password_modal.html:22
+msgid "Confirmar Contrasinal"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:7
+msgid "Editar rexistro"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:14
+#: app/templates/station/management/edit_registers.html:21
+#: app/templates/station/management/get_reports.html:13
+msgid "Tipo"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:18
+#: app/templates/station/management/edit_registers.html:25
+#: app/templates/station/management/get_reports.html:17
+msgid "Madrugadores"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:27
+#: app/templates/station/management/edit_registers.html:32
+msgid "Alumno"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:39
+msgid "Data"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:51
+msgid "Veu sen avisar"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:59
+msgid "Non se presentou"
+msgstr ""
+
+#: app/templates/station/management/edit_register_modal.html:67
+msgid "Notas"
+msgstr ""
+
+#: app/templates/station/management/edit_registers.html:24
+#: app/templates/station/management/edit_registers.html:35
+#: app/templates/station/management/edit_registers.html:46
+#: app/templates/station/management/get_reports.html:16
+#: app/templates/station/management/get_reports.html:27
+msgid "Todos"
+msgstr ""
+
+#: app/templates/station/management/edit_registers.html:77
+msgid "Procurar"
+msgstr ""
+
+#: app/templates/station/management/edit_registers.html:80
+msgid "Novo rexistro"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:12
+msgid "Listaxe de centros"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:14
+msgid "Novo centro"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:24
+msgid "Nome do centro"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:28
+#: app/templates/station/management/edit_user.html:49
+msgid "Teléfono"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:33
+msgid "Correo Electrónico"
+msgstr ""
+
+#: app/templates/station/management/edit_school.html:37
+msgid "Enderezo"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:12
+msgid "Listaxe de alumnos"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:14
+msgid "Novo alumnos"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:23
+#: app/templates/station/management/edit_user.html:25
+#: app/templates/station/management/get_reports.html:24
+msgid "Nome"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:27
+#: app/templates/station/management/edit_user.html:30
+msgid "Apelidos"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:40
+msgid "Curso actual"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:50
+msgid "Centro educativo"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:60
+msgid "Número de irmán"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:64
+msgid "Número de rexistro"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:68
+msgid "DNI ou documento identificativo"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:74
+msgid "Correo electrónico avisos"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:78
+msgid "Teléfono avisos"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:83
+msgid "Enderezo de residencia"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:87
+msgid "Alerxias alimentarias"
+msgstr ""
+
+#: app/templates/station/management/edit_student.html:91
+msgid "Alerxías/intolerancias"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:12
+msgid "Listaxe de usuarios"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:15
+msgid "Novo usuario"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:37
+msgid "Socio"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:44
+msgid "Correo electrónico"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:56
+msgid "DNI"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:62
+msgid "Roles do usuario"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:72
+msgid "Conta de usuario"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:86
+msgid "Alumnos vinculados"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:94
+msgid "Centros do usuario"
+msgstr ""
+
+#: app/templates/station/management/edit_user.html:107
+msgid "Reenviar contrasinal"
+msgstr ""
+
+#: app/templates/station/management/get_earlycare_reports.html:35
+#: app/templates/station/management/get_lunchcare_reports.html:27
+#: app/templates/station/management/get_reports.html:57
+msgid "Obter listaxe"
+msgstr ""
+
+#: app/templates/station/management/get_lunchcare_reports.html:15
+msgid "Mes/Ano"
+msgstr ""
+
+#: app/templates/station/management/role_modal.html:22
+msgid "Escoller roles do usuario"
+msgstr ""
+
+#: app/templates/station/management/school_modal.html:22
+msgid "Escoller centros do usuario"
+msgstr ""
+
+#: app/templates/station/management/student_modal.html:22
+msgid "Escoller alumnos vinculados"
+msgstr ""
+
+#: app/templates/station/management/student_modal.html:38
+msgid "Ver todos"
+msgstr ""
+

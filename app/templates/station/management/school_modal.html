@@ -1,0 +1,45 @@
+<div class="modal" id="selectSchoolModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- template schema, hidden from the dom -->
+      <template id="school-template">
+        <!-- template content -->
+        <div class="mb-3 row selected-school-group">
+          <label class="col-8 col-form-label" id="labelSchool"></label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedSchool" type="checkbox" class="primary">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+      </template>
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+        <h4 class="modal-title">{{_("Escoller centros do usuario")}}</h4>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid" id="selectSchoolModalBody">
+        {% for school in schools_list %}
+        <div class="mb-3 row selected-school-group">
+          <label for="selectedSchool-{{school.id}}" class="col-8 col-form-label">{{school.name}}</label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input type="checkbox" id="selectedSchool-{{school.id}}" name="selectedSchool-{{school.id}}" class="primary" {%if school.is_selected and school.is_selected==1 %}checked{%endif%}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeSchoolModal()">{{_("Pechar")}}</button>
+      </div>
+    </div>
+  </div>
+</div>

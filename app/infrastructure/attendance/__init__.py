@@ -1,0 +1,1 @@
+# infrastructure/attendance — package marker

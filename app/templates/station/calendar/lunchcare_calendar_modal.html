@@ -1,0 +1,39 @@
+<div class="modal" id="selectLunchCareCalendarModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="calendarInterval"></h6>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid" id="selectLunchCareCalendarModalBody">
+        <div class="d-flex flex-row align-items-start mb-3">
+
+        </div>
+        <div class="container-fluid" id="div-lunchcare-madrugadores-almuerzo">
+            <h6 id="lunchcare-madrugadores-almuerzo" name="lunchcare-madrugadores-almuerzo"></h6>
+            <ul>
+              <li id="almorzo-infantil">{{ _("Infantil") }}</li>
+              <li id="almorzo-primaria">{{ _("Primaria") }}</li>
+            </ul>
+            <h6 id="lunchcare-madrugadores-almuerzo-intolerances" name="lunchcare-madrugadores-almuerzo-intolerances"></h6>
+        </div>
+          <br />
+          <br />
+        <div class="container-fluid" id="div-lunchcare-comedor">
+            <h6 id="lunchcare-comedor" name="lunchcare-comedor"></h6>
+            <ul>
+              <li id="comedor-infantil">{{ _("Infantil") }}</li>
+              <li id="comedor-primaria">{{ _("Primaria") }}</li>
+            </ul>
+            <h6 id="lunchcare-comedor-intolerances" name="lunchcare-comedor-intolerances"></h6>
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="acceptEvents()">{{_("Aceptar")}}</button>
+        <button type="button" class="btn btn-danger" onclick="cancelEvents()">{{_("Cancelar")}}</button>
+      </div>
+    </div>
+  </div>
+</div>

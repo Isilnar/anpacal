@@ -1,0 +1,66 @@
+<div class="modal" id="selectCalendarModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- template schema, hidden from the dom -->
+      <template id="event-template">
+        <!-- template content -->
+        <div class="mb-3 row selected-events-group d-flex align-items-center">
+          <label class="col-12 col-form-label" id="labelStudentName"></label>
+          <img class="col-3 col-sm-2" src="{{ url_for('static', filename='images/madrugadores+.png') }}">
+          <label class="col-6 col-form-label">{{ _("Madrugadores con almorzo") }}</label>
+          <div class="col-3 col-sm-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedPlusEarly" type="checkbox" class="primary" onchange="earlyChange(this, 0)">
+                <span class="slider round"></span>
+              </label>
+          </div>
+          <img class="col-3 col-sm-2" src="{{ url_for('static', filename='images/madrugadores.png') }}">
+          <label class="col-6 col-form-label">{{ _("Madrugadores sin almorzo") }}</label>
+          <div class="col-3 col-sm-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedEarly" type="checkbox" class="primary" onchange="earlyChange(this, 0)">
+                <span class="slider round"></span>
+              </label>
+          </div>
+          <img class="col-3 col-sm-2" src="{{ url_for('static', filename='images/comedor.png') }}">
+          <label class="col-6 col-form-label">{{ _("Comedor") }}</label>
+          <div class="col-3 col-sm-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedLunch" type="checkbox" class="primary">
+                <span class="slider round"></span>
+              </label>
+          </div>
+        </div>
+      </template>
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+        <h6 class="modal-title" id="calendarInterval"></h6>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid" id="selectCalendarModalBody">
+        <div class="d-flex flex-row align-items-start mb-3">
+              <label for="set-to-date" class="col-3 col-form-label">{{_("Ata")}}</label>
+              <div class="col-9">
+                <div class="input-group date" id="set-to-date" name="set-to-date" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" id="set-to-date-value" name="set-to-date-value" data-target="#set-to-date" data-input/>
+                  <div class="input-group-append" data-target="#set-to-date" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="set-from-date-value">
+        </div>
+        <div class="container-fluid" id="selectCalendarModalStudentsSection">
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="acceptEvents()">{{_("Aceptar")}}</button>
+        <button type="button" class="btn btn-danger" onclick="cancelEvents()">{{_("Cancelar")}}</button>
+      </div>
+    </div>
+  </div>
+</div>

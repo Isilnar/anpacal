@@ -1,0 +1,121 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles-management.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+<div class="container-fluid mt-3 mb-3">
+<form id="holydaysForm" action="{{ url_for('holyday_bp.list_holydays') }}" method="POST" style="width:100%;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <div class="row">
+    <div class="mb-3 col-md-4 wrapper">
+      <label for="selectedHolyday">{{_("Listaxe de festivos")}}</label>
+      <select size="10" class="form-select selection" id="selectedHolyday" name="selectedHolyday" onchange="changeHolyday()">
+        <option value=0 {% if not current_holyday %}selected{% endif %}>{{_("Novo festivo")}}</option>
+        {% for holyday in holydays_list %}
+            <option value={{holyday.id}} {%if current_holyday and current_holyday.id==holyday.id %}selected{% endif %}>{{holyday.holyday}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3 col-md-8">
+      <div class="row ms-2 me-2">
+        <label for="dataHolydayDate" class="col-form-label">{{_('Data festivo')}}</label>
+        <div class="input-group date" id="dataHolydayDate" name="dataHolydayDate" data-target-input="nearest">
+          <input type="text" class="form-control datetimepicker-input" id="dataHolydayDateValue" name="dataHolydayDateValue" data-target="#date-holyday-date" data-input/>
+          <div class="input-group-append" data-target="#dataHolydayDate" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="mb-3 mt-3">
+    <button type="button" class="btn btn-success w-100" onclick="saveHolyday()">{{_("Gardar")}}</button>
+    <button type="button" class="btn btn-dark w-100" onclick="deleteHolyday()" id="deleteHolydayBtn" {% if not current_holyday %}style="display: none;"{% else %}style="display: block;"{% endif %}>{{_("Borrar")}}</button>
+    <button type="button" class="btn btn-primary w-100" onclick="location.href='{{ url_for('main_bp.index') }}';">{{_("Saír")}}</button>
+  </div>
+</form>
+</div>
+
+{% endblock body %}
+
+{% block js_script %}
+<script type="text/javascript">
+
+    $(function () {
+        flatpickr('#dataHolydayDate', {
+            wrap: true,
+            locale: window.FLATPICKR_LOCALE,
+            dateFormat: 'd/m/Y',
+            defaultDate: new Date()
+        });
+    });
+
+    function saveHolyday(){
+        if (validateHolyday()){
+            let e = document.getElementById("selectedHolyday");
+            let holydayId = e.options[e.selectedIndex].value;
+            if (holydayId !== '0') {
+                let editUrl = "{{ url_for('holyday_bp.edit_holyday', holyday_id=0) }}".replace('/0', '/' + holydayId);
+                document.forms['holydaysForm'].setAttribute('action', editUrl);
+            }
+            document.forms['holydaysForm'].submit();
+        }
+    }
+
+    function validateHolyday(){
+        removeErrors();
+        let res = true;
+
+        if ($("#dataHolydayDateValue").val() == ""){
+            res = false;
+            showError("dataHolydayDateValue", "Debe poñer unha data");
+        }
+
+        return res;
+    }
+
+    function deleteHolyday(){
+      let e = document.getElementById("selectedHolyday");
+      let holydayId = e.options[e.selectedIndex].value;
+      let deleteUrl = "{{ url_for('holyday_bp.delete_holyday', holyday_id=0) }}".replace('/0/', '/' + holydayId + '/');
+      document.forms['holydaysForm'].setAttribute('action', deleteUrl);
+      document.forms['holydaysForm'].submit();
+    }
+
+    function changeHolyday(){
+        removeErrors();
+      let e = document.getElementById("selectedHolyday");
+      if(e.options[e.selectedIndex].value=='0'){
+        document.getElementById("dataHolydayDateValue").value = '';
+      }else{
+        document.getElementById("deleteHolydayBtn").style.display="block";
+        loadHolyday();
+      }
+    }
+
+    function loadHolyday(){
+
+      let e = document.getElementById("selectedHolyday");
+      let holydayId = e.options[e.selectedIndex].value;
+      let baseUrl = "{{ url_for('holyday_bp.get_holyday', holyday_id=0) }}".replace('/0', '/' + holydayId);
+      fetch(baseUrl, {
+        method: 'GET',
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        return response.json();
+      }).then(function(data_array) {
+        document.getElementById("dataHolydayDateValue").value = data_array["holyday_formated"];
+        console.log(data_array);
+      });
+    }
+
+</script>
+{% endblock js_script%}
+
+{% block cur_navlink %}'nav-link-manage-holydays'{% endblock cur_navlink%}

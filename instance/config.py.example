@@ -1,0 +1,91 @@
+"""
+instance/config.py — Deployment-specific configuration.
+
+Copy this file to instance/config.py and fill in real values.
+The actual config.py is git-ignored and never committed.
+"""
+
+import os
+
+# --- Flask / SQLAlchemy -------------------------------------------------------
+DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_DATABASE_URI = "sqlite:///../database_bcrypt.db"
+
+# Required — generate with: python -c "import secrets; print(secrets.token_urlsafe(20))"
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
+# Required — generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+FERNET_KEY = os.environ.get("FERNET_KEY", "")
+
+# CSRF: disable SSL-strict check when running behind a reverse proxy over HTTP
+WTF_CSRF_SSL_STRICT = False
+
+# --- Internationalization -----------------------------------------------------
+LANGUAGES = ["gl", "es", "en"]
+BABEL_DEFAULT_LOCALE = "gl"
+
+# --- Roles and courses (seeded on first request) ------------------------------
+DEFAULT_ROLES = [
+    ("admin", "Administrador"),
+    ("family", "Familia"),
+    ("earlycare", "Coidadora madrugadores"),
+    ("lunchcare", "Coidadora comedor"),
+]
+DEFAULT_COURSES = [
+    (1, "4º EI"), (2, "5º EI"), (3, "6º EI"),
+    (4, "1º EP"), (5, "2º EP"), (6, "3º EP"),
+    (7, "4º EP"), (8, "5º EP"), (9, "6º EP"),
+]
+
+# --- Server -------------------------------------------------------------------
+SERVER_HOST_NO_CERTS = "0.0.0.0"
+SERVER_PORT_NO_CERTS = 37666
+SERVER_HOST_WITH_CERTS = "0.0.0.0"
+SERVER_PORT_WITH_CERTS = 37666
+
+# --- Branding -----------------------------------------------------------------
+APP_TITLE = "ANPA Example"
+APP_DESC = "Aplicación de gestión de madrugadores y comedor"
+COMPANY_NAME = "ANPA Example"
+COMPANY_VAT = ""
+COMPANY_PHONE = ""
+COMPANY_MAIL = "anpa@example.com"
+COMPANY_ADDRESS = ""
+COPYRIGHT_TEXT = "© Your Name 2026"
+
+# --- School year and calendar -------------------------------------------------
+SCHOOL_YEAR_START = "2025-09-01"  # Update each September
+
+# Family calendar edit cutoff: (hour, minute, second, microsecond) in Europe/Madrid.
+# After this time, families cannot modify attendance for the current day.
+CALENDAR_EDIT_CUTOFF_TIME = (9, 15, 0, 0)
+
+# --- Auto-update check --------------------------------------------------------
+CHECK_UPDATE_SECS = 60
+DISABLE_UPDATE_SSL_CHECK = 1
+
+# --- Rate limiting ------------------------------------------------------------
+RATELIMIT_STORAGE_URI = "memory://"
+
+# --- Mail (optional — only needed for credential delivery) --------------------
+MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.example.com")
+MAIL_PORT = int(os.environ.get("MAIL_PORT", "587"))
+MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "True") == "True"
+MAIL_USE_SSL = os.environ.get("MAIL_USE_SSL", "False") == "False"
+MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
+MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+MAIL_RESPONSE_ADDRESS = os.environ.get("MAIL_RESPONSE_ADDRESS", "")
+
+# --- PWA (0 = disabled, 1 = enabled) -----------------------------------------
+# When enabled, the app registers a Service Worker for offline support
+# and shows an install prompt on compatible browsers/devices.
+IS_PWA = 0
+
+# --- Diet intolerances (seeded on first request) ------------------------------
+DEFAULT_DIET_INTOLERANCES = [
+    ("1", "Sal", 1), ("2", "Azucre", 1), ("3", "Cacahuetes", 0), ("4", "Glute", 1),
+    ("5", "Lácteos", 1), ("6", "Froitos Secos", 1), ("7", "Apio", 0), ("8", "Mostaza", 0),
+    ("9", "Ovos", 1), ("10", "Sésamo", 0), ("11", "Peixe", 1), ("12", "Crustáceos", 1),
+    ("13", "Moluscos", 1), ("14", "Soia", 1), ("15", "Sulfitos", 0), ("16", "Altramuces", 0),
+]

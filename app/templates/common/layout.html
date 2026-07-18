@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/android-launchericon-96-96.png') }}">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/v4-shims.min.css" integrity="sha512-U+fiq69HDM4etLVUiZeQxmJE5AZoft4ti4TIM95MqXV0IjBXgT2oHw5cNeIFqz3OE/axTKQIR8e7zlm3xbOVmg==" crossorigin="anonymous">
+    <!-- FA upgrade: DEFERRED – v4-shim icons present: fa-clock-o, fa-paper-plane-o, fa-sticky-note-o, fa-arrow-circle-o-down, fa-address-card-o, fa-cutlery, fa-grav, fa-pie-chart, fa-retweet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous"/>
+    {% block css_styles %}{% endblock css_styles%}
+    <meta name="theme-color" content="#34A5DA">
+
+    <link rel="manifest" href="{{ url_for('main_bp.manifest') }}" />
+
+    <!-- iOS -->
+    <link rel="apple-touch-icon"                       href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <meta name="apple-mobile-web-app-capable"          content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection"                      content="telephone=no">
+
+    <title>{{config['APP_TITLE']|upper}}</title>
+    <meta name="description" content={{config['APP_DESC']}}>
+    <script src='https://cdn.jsdelivr.net/npm/moment@2.30.1/min/moment-with-locales.min.js' integrity="sha384-Jx7nF8Lr+lkOLpB9WqQqk6OK83W8P87BGQxdNEFvHM5SEiItXH87Ednyl0soQZs8" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13" integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js" integrity="sha256-G5b/9Xk32jhqv0GG6ZcNalPQ+lh/ANEGLHYV6BLksIw=" crossorigin="anonymous"></script>
+    <script>
+    // Galician locale for Flatpickr (CDN l10n/gl.js da 404)
+    var galicianLocale = {
+        weekdays: { shorthand: ['Dom', 'Lun', 'Mar', 'Mér', 'Xov', 'Ven', 'Sáb'], longhand: ['Domingo', 'Luns', 'Martes', 'Mércores', 'Xoves', 'Venres', 'Sábado'] },
+        months: { shorthand: ['Xan', 'Feb', 'Mar', 'Abr', 'Mai', 'Xuñ', 'Xul', 'Ago', 'Set', 'Out', 'Nov', 'Dec'], longhand: ['Xaneiro', 'Febreiro', 'Marzo', 'Abril', 'Maio', 'Xuño', 'Xulio', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Decembro'] },
+        firstDayOfWeek: 1, rangeSeparator: ' a ', weekAbbreviation: 'Sem', scrollTitle: 'Desprácese para incrementar', toggleTitle: 'Preme para cambiar',
+        ordinal: function (nth) { var s = nth % 100; if (s > 3 && s < 21) return 'º'; switch (s % 10) { case 1: return 'º'; case 2: return 'º'; case 3: return 'º'; default: return 'º'; } }
+    };
+    // Register locale in flatpickr.l10ns AND set global based on current locale
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr.l10ns.gl = galicianLocale;
+    }
+    {% if get_locale() == 'gl' %}
+    if (typeof flatpickr !== 'undefined') { flatpickr.localize(flatpickr.l10ns.gl); }
+    window.FLATPICKR_LOCALE = galicianLocale;
+    {% elif get_locale() == 'es' %}
+    window.FLATPICKR_LOCALE = (typeof flatpickr !== 'undefined' && flatpickr.l10ns.es) ? flatpickr.l10ns.es : 'es';
+    {% else %}
+    window.FLATPICKR_LOCALE = 'default';
+    {% endif %}
+    </script>
+    <style>.flatpickr-calendar { z-index: 9999 !important; }</style>
+         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js' integrity="sha384-cdgKlW4XCZfQ8yQFLScLHBujFrHf3sMYBPBjRimt2H/ut44fe4t/PUk3luazptar" crossorigin="anonymous"></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/moment@6.1.20/index.global.min.js' integrity="sha384-IutdP3i0doDG7w5jAP3h+/GHuOfnLmHkFsO5nYxrBL4xL89lpFLD55ACPgvLrNFg" crossorigin="anonymous"></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/locales-all.global.min.js' integrity="sha384-Z5jJROVCX/GTtyM3gOeOA56HZgN5Tar/vCkd0t77ahwyWwAY4RzEnlKjTXgkpLQ4" crossorigin="anonymous"></script>
+    <script src='{{ url_for("static", filename="js/common.js") }}'></script>
+
+
+</head>
+<body>
+  <!-- https://codepen.io/androidcss/pen/yOopGp -->
+  {% include 'common/navbar.html' %}
+  <div class="offline-notification">{{_("A aplicación non está en liña. Por favor, comprobe a su conexión.")}}</div>
+  <div class="container-fluid" id="master-app-container">
+    {% block body %}
+    {% endblock body%}
+  </div>
+
+  <div id="infoToastContainer" style="display:none">
+    <div class="toast" id="infoToast" style="position: fixed; z-index: 1; bottom: 10px; right: 10px; left: 10px;">
+      <div class="toast-header" id="infoToastHeader">
+          <strong class="me-auto" id="infoToastTitle"><i class="fa fa-grav"></i></strong>
+      </div>
+      <div class="toast-body">
+          <div id="infoToastText"></div>
+      </div>
+    </div>
+  </div>
+  {% if config['IS_PWA'] and config['IS_PWA']==1 %}
+   <script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+   <script type="text/javascript" src="{{ url_for('static', filename='js/register-service-worker.js') }}"></script>
+   <script type="text/javascript">
+		registerServiceWorker("/service-worker.js");
+   </script>
+   {% endif %}
+   <script>
+     $(document).ready(function(){
+       var current_navlink = {% block cur_navlink %}''{% endblock cur_navlink%}
+       if (current_navlink.length > 0) {
+         $('#'+current_navlink).css('color', '#ffff00ff');
+         $('#xs-menu-text').text($('#'+current_navlink).text())
+       }else{
+         $('#xs-menu-text').text("{{config['APP_TITLE']}}")
+       }
+
+       {%  with toast_msg_list = get_flashed_messages() %}
+       {% if toast_msg_list %}
+           $("#infoToastTitle").text('{{toast_msg_list[0].Title}}')
+           $("#infoToastText").text('{{toast_msg_list[0].Info}}')
+           format = $("#infoToastHeader").attr('class').split(/\s+/);
+           if(format.indexOf("bg-")>-1){
+             $("#infoToastHeader").removeClass(format[format.indexOf("bg-")]);
+           }
+           if(format.indexOf("text-")>-1){
+             $("#infoToastHeader").removeClass(format[format.indexOf("text-")]);
+           }
+           {% if toast_msg_list[0].Type == 0 %}
+             $("#infoToastHeader").addClass("bg-danger");
+             $("#infoToastHeader").addClass("text-white");
+           {% elif toast_msg_list[0].Type == 1 %}
+             $("#infoToastHeader").addClass("bg-success");
+             $("#infoToastHeader").addClass("text-white");
+           {% elif toast_msg_list[0].Type == 2 %}
+             $("#infoToastHeader").addClass("bg-info");
+             $("#infoToastHeader").addClass("text-white");
+           {% elif toast_msg_list[0].Type == 3 %}
+             $("#infoToastHeader").addClass("bg-dark");
+             $("#infoToastHeader").addClass("text-white");
+           {% endif %}
+           new bootstrap.Toast(document.getElementById('infoToast'), { delay: 3000 }).show();
+       {% endif %}
+       {% endwith %}
+     });
+
+     $('#infoToast').on('show.bs.toast', function () {
+       $("#infoToastContainer").css("display", "block");
+     });
+
+     $('#infoToast').on('hidden.bs.toast', function () {
+       $("#infoToastContainer").css("display", "none");
+     });
+   </script>
+  {% block child_js_script %}
+  {% endblock child_js_script%}
+  {% block js_script %}
+  {% endblock js_script%}
+</body>
+</html>

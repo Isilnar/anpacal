@@ -1,0 +1,16 @@
+{% extends 'common/layout.html' %}
+
+{% block body %}
+    <section id="offline">
+      <div class="container">
+      <div class="card bg-danger">
+          <div class="card-body text-center">
+            <h4 class="card-title">{{ _("Erro de conexión") }}</h4>
+            <p class="card-text">{{ _("Parece que non se pode conectar ao servidor... Perdón polas molestias!") }}</p>
+            <p>{{ _("Agarde uns intres e se o problema persiste, póñase en contacto co seu centro de referencia") }}</p>
+            <a href="/" class="btn btn-secondary">{{ _("Intentar cargar de novo a aplicación") }}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock %}

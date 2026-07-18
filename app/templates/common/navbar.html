@@ -1,0 +1,116 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+  <!-- Brand/logo -->
+  <a class="navbar-brand" href="/">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo" style="width:40px;">
+  </a>
+  <!--
+   -->
+  <span class="navbar-text d-block d-sm-none" id="xs-menu-text" style="color:#ffffffff"></span>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <!-- Navbar links -->
+  <div class="collapse navbar-collapse justify-content-between" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+    {% if current_user.is_authenticated %}
+      {% if current_user.is_admin()%}
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-schools" href="{{url_for('school_bp.list_schools')}}">{{_("Xestión de centros")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-students" href="{{url_for('student_bp.list_students')}}">{{_("Xestión de alumnos")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-users" href="{{url_for('user_bp.list_users')}}">{{_("Xestión de usuarios")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-reports" href="{{url_for('reports_bp.management_reports')}}">{{_("Xeración de informes")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-registers" href="{{url_for('edit_registers_bp.management_edit')}}">{{_("Engadir/modificar rexistros")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-holydays" href="{{url_for('holyday_bp.list_holydays')}}">{{_("Xestión de festivos")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-menu" href="{{url_for('menu_bp.get_menu')}}">{{_("Xestión de menú")}}</a>
+      </li>
+      {% endif %}
+      {% if current_user.is_family() or current_user.is_lunchcare() or current_user.is_earlycare() %}
+      <li class="nav-item">
+        <a target="_blank" class="nav-link" id="nav-link-menu" href="{{ menu_link }}">{{_("Menú")}}</a>
+      </li>
+      {% endif %}
+      {% if current_user.is_family() %}
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-calendar" href="{{url_for('calendar_station.management_calendar')}}">{{_("Xestión de calendario escolar")}}</a>
+      </li>
+      {% endif %}
+      {% if current_user.is_lunchcare() %}
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-lunchcare-calendar" href="{{url_for('calendar_station.management_lunchcare_calendar_post')}}">{{_("Xestión de calendario comedor")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-lunchcare-reports" href="{{url_for('lunchcare_reports_bp.management_lunchcare_reports')}}">{{_("Xeración de informes comedor")}}</a>
+      </li>
+      {% endif %}
+      {% if current_user.is_earlycare() %}
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-earlycare-calendar" href="{{url_for('calendar_station.management_earlycare_calendar_post')}}">{{_("Xestión de calendario madrugadores")}}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="nav-link-manage-earlycare-reports" href="{{url_for('earlycare_reports_bp.management_earlycare_reports')}}">{{_("Xeración de informes madrugadores")}}</a>
+      </li>
+      {% endif %}
+      {% if current_user.is_family() or current_user.is_lunchcare() or current_user.is_earlycare() %}
+          <li class="nav-item">
+            <a class="nav-link" id="nav-link-manage-password" href="{{ url_for('main_bp.index') }}?change_password=1">{{_("Modificar contrasinal")}}</a>
+          </li>
+      {% endif %}
+    {% endif %}
+    </ul>
+    <ul class="navbar-nav">
+    {% if current_user.is_authenticated %}
+      <li class="nav-item d-flex align-items-center ms-2">
+        <form action="{{ url_for('main_bp.set_language', lang='gl') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1 me-1">GL</button>
+        </form>
+        <form action="{{ url_for('main_bp.set_language', lang='es') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1 me-1">ES</button>
+        </form>
+        <form action="{{ url_for('main_bp.set_language', lang='en') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1">EN</button>
+        </form>
+      </li>
+      <div class="topnav-right" style="float:right;">
+        <li class="nav-item">
+         <a id="appLogOut" class="nav-link" href="{{ url_for('auth.logout') }}">{{ _("Pechar sesión") }}</a>
+        </li>
+      </div>
+    {% else %}
+      <li class="nav-item d-flex align-items-center ms-2">
+        <form action="{{ url_for('main_bp.set_language', lang='gl') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1 me-1">GL</button>
+        </form>
+        <form action="{{ url_for('main_bp.set_language', lang='es') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1 me-1">ES</button>
+        </form>
+        <form action="{{ url_for('main_bp.set_language', lang='en') }}" method="POST" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button type="submit" class="btn btn-sm btn-outline-light py-0 px-1">EN</button>
+        </form>
+      </li>
+      <div class="topnav-right">
+       <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _("Comezar sesión") }}</a>
+       </li>
+      </div>
+    {% endif %}
+    </ul>
+  </div>
+</nav>

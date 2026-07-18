@@ -1,0 +1,45 @@
+<div class="modal" id="selectIntoleranceModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- template schema, hidden from the dom -->
+      <template id="intolerance-template">
+        <!-- template content -->
+        <div class="mb-3 row selected-intolerance-group">
+          <label class="col-8 col-form-label" id="labelIntolerance"></label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input id="selectedIntolerance" type="checkbox" class="primary">
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+      </template>
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+        <h4 class="modal-title">{{_("Escoller alerxías/intolerancias do alumno")}}</h4>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body container-fluid" id="selectIntoleranceModalBody">
+        {% for r in intolerances_list %}
+        <div class="mb-3 row selected-intolerance-group">
+          <label for="selectedIntolerance-{{r.id}}" class="col-8 col-form-label">{{r.description}}</label>
+            <div class="col-4 align-self-center text-center">
+              <label class="switch">
+                <input type="checkbox" id="selectedIntolerance-{{r.id}}" name="selectedIntolerance-{{r.id}}" class="primary" {%if r.is_selected and r.is_selected==1 %}checked{%endif%}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeIntoleranceModal()">{{_("Pechar")}}</button>
+      </div>
+    </div>
+  </div>
+</div>

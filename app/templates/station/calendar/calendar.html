@@ -1,0 +1,301 @@
+{% extends 'common/layout.html' %}
+
+{% block css_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles-calendar.css') }}">
+{% endblock css_styles%}
+
+{% block body %}
+    <div id='calendar' class="mt-1 mb-1"></div>
+    {% include 'station/calendar/calendar_modal.html' %}
+{% endblock body %}
+
+{% block cur_navlink %}'nav-link-manage-calendar'{% endblock cur_navlink%}
+
+{% block js_script %}
+<script type="text/javascript">
+    var fpSetToDate;
+    $(function () {
+        window.fpSetToDate = flatpickr('#set-to-date', {
+            wrap: true, locale: window.FLATPICKR_LOCALE, dateFormat: 'd/m/Y',
+            disable: [
+                function(date) { return date.getDay() === 0 || date.getDay() === 6; }
+            ]
+        });
+    });
+</script>
+<script>
+
+var STATIC_IMAGES = "{{ url_for('static', filename='images/') }}";
+var fullCalendar;
+
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: '{{ get_locale() }}',
+
+    views: {
+      month: {
+        titleFormat: 'MMMM [de] YYYY'
+      }
+    },
+
+    headerToolbar:{
+        left:'title',
+        right:'prev,today,next'
+    },
+
+    //initialView: 'dayGridMonth',
+    //selectable: true,
+    weekends: false,
+    initialDate: '{{current_date}}',
+    height: 'auto',
+    contentHeight: 48,
+    eventColor: 'transparent',
+    validRange: {start: '{{current_start_date}}'},
+    dateClick: function(info) {
+        select_event(info.dateStr);
+    },
+    eventClick: function(info) {
+        select_event(info.event.startStr);
+    },
+    //select: function(info) {
+	//	alert('selected ' + info.startStr + ' to ' + info.endStr);
+    //},
+    events: [
+      //{
+      //  title: 'All Day Event',
+      //  start: '2020-09-15',
+      //  customHtml: '<div style="text-align: center;"><img src="static/images/early_lunch.png" style="width:100%;max-width:96px;height:auto"></div>'
+      //},
+      {% for ev in current_events %}
+      {
+        id:'{{ev[2]}}',
+        start:'{{ev[0]}}',
+        customHtml: '<div style="text-align: center;"><img src="{{ url_for('static', filename='images/') }}{{ev[1]}}.png" style="width:100%;max-width:96px;height:auto"></div>'
+      },
+      {% endfor %}
+    ],
+    eventContent: function(eventInfo) {
+      return { html: eventInfo.event.extendedProps.customHtml }
+    },
+    datesSet: function(dateInfo) {
+        disbleSpecificDates();
+    }
+  });
+
+  calendar.render();
+  fullCalendar = calendar;
+
+});
+
+function disbleSpecificDates(){
+    {% for disabled_date in disabled_dates %}
+        disableDate('{{disabled_date}}');
+    {% endfor %}
+    {% for disabled_date in disabled_calendar_dates %}
+        disableDate('{{disabled_date}}');
+    {% endfor %}
+}
+
+function disableDate(specificDate){
+    let cell = $(".fc-daygrid-day[data-date="+specificDate+"]");
+    let cell_number = cell.find(".fc-daygrid-day-number");
+    let cell_div_remove = cell.find(".fc-daygrid-day-top");
+    //cell_number.empty();
+    cell_div_remove.remove();
+    cell.removeClass("fc-day-future");
+    cell.addClass("fc-day-disabled");
+}
+
+function earlyChange(el, student_id){
+    let chkEarly = $("#selectedEarly-"+ student_id.toString());
+    let chkEarlyPlus = $("#selectedPlusEarly-"+ student_id.toString());
+
+    //console.log($(el).attr('id'));
+    //console.log("Student_id: ", student_id);
+    //console.log("Early value: ", chkEarly.prop('checked'));
+    //console.log("EarlyPlus value: ", chkEarlyPlus.prop('checked'));
+
+    if ($(el).attr('id') === "selectedEarly-" + student_id.toString()){
+        if (chkEarlyPlus.prop('checked') === true){
+            chkEarlyPlus.prop('checked', false);
+        }
+    }
+    else{
+        if ($(el).attr('id') === "selectedPlusEarly-" + student_id.toString()){
+        if (chkEarly.prop('checked') === true){
+            chkEarly.prop('checked', false);
+        }
+        }
+    }
+}
+
+function select_event(date){
+    // alert('clicked event ' + date);
+    load_event(date);
+};
+
+function load_event(event_date){
+    let disabled_dates = [{% for disabled_date in disabled_dates %}'{{disabled_date}}',{% endfor %}]
+    let disabled_calendar_dates = [{% for disabled_date in disabled_calendar_dates %}'{{disabled_date}}',{% endfor %}]
+//console.log("Fechas a deshabilitar: ", disabled_calendar_dates);
+    if (!disabled_dates.includes(event_date) && !disabled_calendar_dates.includes(event_date)){
+      var data_request = {current_event_date: event_date, center_id: {{current_school.id}},};
+      fetch('load_calendar_event', {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify(data_request), // data can be `string` or {object}!
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        return response.json();
+      }).then(function(data_array) {
+          console.log("Trea de vuelta datos del evento: ", data_array);
+        var min_date = new Date(event_date);
+        min_date.setDate(min_date.getDate()-1);
+        console.log("Fecha minima: ", min_date);
+        document.getElementById("set-from-date-value").value = data_array.current_date;
+        window.fpSetToDate.set('minDate', min_date);
+        window.fpSetToDate.set('disable', [
+            function(d) { return d.getDay() === 0 || d.getDay() === 6; },
+            min_date,
+            {% for disabled_date in disabled_dates_reverse %}'{{ disabled_date | replace("-", "/") }}',{% endfor %}
+        ]);
+        window.fpSetToDate.setDate(new Date(event_date));
+        document.getElementById("calendarInterval").innerHTML = data_array.locale_date;
+        populateCalendarModal(data_array.current_students_data);
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('selectCalendarModal')).show();
+      });
+
+    }
+    else{
+        console.log("Fecha bloqueada");
+    }
+
+};
+
+function save_event(){
+
+  let from_date = document.getElementById("set-from-date-value").value;
+  let to_date = $('#set-to-date-value').val();
+
+  let early_data = $('[id^="selectedEarly"]');
+  let early_request = {};
+  for (let i = 0; i < early_data.length; i++) {
+      let student_id = early_data[i].id.split("-")[1];
+      early_request[student_id] = 0;
+      if (early_data[i].checked === true){
+          early_request[student_id] = 1;
+      }
+  }
+
+  let early_plus_data = $('[id^="selectedPlusEarly"]');
+  let early_plus_request = {};
+  for (let i = 0; i < early_plus_data.length; i++) {
+      let student_id = early_plus_data[i].id.split("-")[1];
+      early_plus_request[student_id] = 0;
+      if (early_plus_data[i].checked === true){
+          early_plus_request[student_id] = 1;
+      }
+  }
+
+  let lunch_data = $('[id^="selectedLunch"]');
+  let lunch_request = {};
+  for (let i = 0; i < lunch_data.length; i++) {
+      let student_id = lunch_data[i].id.split("-")[1];
+      lunch_request[student_id] = 0;
+      if (lunch_data[i].checked == true){
+          lunch_request[student_id] = 1;
+      }
+  }
+  let data_request = {current_from_date: from_date, current_to_date: to_date,
+                      current_early_request: early_request,
+                      current_early_plus_request: early_plus_request,
+                      current_lunch_request: lunch_request};
+  fetch('save_calendar_event', {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data_request), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data_array) {
+    for(let i=0; i<data_array.event_dates.length; i++){
+        let ev = data_array.event_dates[i];
+        let evType = ev.event_type !== undefined ? ev.event_type : data_array.event_type;
+        let oldEvent = fullCalendar.getEventById(ev.id);
+        if(oldEvent == null){
+            if(evType !== null){
+                fullCalendar.addEvent({
+                    id: ev.id,
+                    start: ev.start,
+                    customHtml: '<div style="text-align: center;"><img src="'+STATIC_IMAGES+evType+'.png" style="width:100%;max-width:96px;height:auto"></div>'
+                });
+            }
+        }else{
+            if(evType === null){
+                oldEvent.remove();
+            }else{
+                oldEvent.setExtendedProp('customHtml','<div style="text-align: center;"><img src="'+STATIC_IMAGES+evType+'.png" style="width:100%;max-width:96px;height:auto"></div>');
+            }
+        }
+    }
+    fullCalendar.render();
+  });
+};
+
+function acceptEvents(){
+    save_event();
+    bootstrap.Modal.getInstance(document.getElementById('selectCalendarModal'))?.hide();
+};
+
+function cancelEvents(){
+    bootstrap.Modal.getInstance(document.getElementById('selectCalendarModal'))?.hide();
+};
+
+function populateCalendarModal(students_array){
+
+  let template = document.querySelector('#event-template');
+  let area = document.querySelector('#selectCalendarModalStudentsSection');
+  area.innerHTML = '';
+  for (let i = 0; i < students_array.length; i++) {
+    let html_msg = getHtmlStudent(template, students_array[i]);
+    // Append template to dom
+    area.appendChild(html_msg);
+  }
+}
+
+function getHtmlStudent(template, itemData){
+    // Clone the HTML template
+    let template_clone = template.content.cloneNode(true);
+
+    // Query & update the template content
+    template_clone.getElementById("labelStudentName").innerHTML = '<b>'+itemData["fullname"]+'</b>';
+    if(itemData.early === 1){
+        template_clone.getElementById('selectedEarly').checked = true;
+    }else{
+        template_clone.getElementById('selectedEarly').checked = false;
+    }
+    template_clone.getElementById('selectedEarly').setAttribute("onchange", "earlyChange(this, '" + itemData["id"] + "');");
+    template_clone.getElementById('selectedEarly').id = 'selectedEarly-'+itemData["id"];
+    if(itemData.early_plus === 1){
+        template_clone.getElementById('selectedPlusEarly').checked = true;
+    }else{
+        template_clone.getElementById('selectedPlusEarly').checked = false;
+    }
+    template_clone.getElementById('selectedPlusEarly').setAttribute("onchange", "earlyChange(this, '" + itemData["id"] + "');");
+    template_clone.getElementById('selectedPlusEarly').id = 'selectedPlusEarly-'+itemData["id"];
+    if(itemData.lunch === 1){
+        template_clone.getElementById('selectedLunch').checked = true;
+    }else{
+        template_clone.getElementById('selectedLunch').checked = false;
+    }
+    template_clone.getElementById('selectedLunch').id = 'selectedLunch-'+itemData["id"];
+
+    return template_clone;
+}
+</script>
+
+{% endblock js_script %}

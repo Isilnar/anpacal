@@ -1,0 +1,81 @@
+<div class="modal" id="editRegisterModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 id="editRegisterModalTittle" class="modal-title">{{_("Editar rexistro")}}</h4>
+      </div>
+
+      <!-- Modal body -->
+        <input type="hidden" id="registerIdModal" name="registerIdModal">
+      <div class="modal-body container-fluid" id="editRegisterModalBody">
+        <div class="d-flex flex-row align-items-start mb-3">
+          <label for="reportTypeModal" class="p-2 col-form-label">{{_('Tipo')}}</label>
+          <div class="col">
+              <select class="form-control" id="reportTypeModal" name="reportTypeModal" onchange="">
+                  <option value="0" selected>---</option>
+                  <option value="1" >{{_('Madrugadores')}}</option>
+                  <option value="2">{{_('Madrugadores con almorzo')}}</option>
+                  <option value="3">{{_('Comedor')}}</option>
+              </select>
+          </div>
+        </div>
+      </div>
+
+    <div class="d-flex flex-row align-items-start mb-3">
+      <label for="peopleNameModal" class="p-2 col-form-label">{{_('Alumno')}}</label>
+      <div class="col">
+      <select class="form-control" id="peopleNameModal" name="peopleNameModal" onchange="">
+        <option value="0" selected>---</option>
+        {% for student in student_list %}
+          <option value="{{student.id}}">{{student.surname}}, {{student.name}}</option>
+        {% endfor %}
+      </select>
+      </div>
+    </div>
+
+     <div class="d-flex flex-row align-items-start mb-3">
+        <label for="dateModal" class="p-2 col-form-label">{{_('Data')}}</label>
+        <div class="col">
+          <div class="input-group date" id="dateModal" name="dateModal" data-target-input="nearest">
+            <input type="text" class="form-control datetimepicker-input" id="dateModalValue" name="dateModalValue" data-target="#date-from-date" data-input/>
+            <div class="input-group-append" data-target="#dateModal" data-toggle="datetimepicker">
+              <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div id="div-asExtraModal" class="align-items-start mb-3">
+         <label for="asExtraModal">{{_("Veu sen avisar")}}</label>
+            <label class="switch" style="float: none;display: block;">
+                <input id="asExtraModal" name="asExtraModal" type="checkbox" class="form-control primary">
+                <span class="slider round"></span>
+         </label>
+    </div>
+
+    <div id="div-notComeModal" class="align-items-start mb-3">
+         <label for="notComeModal">{{_("Non se presentou")}}</label>
+            <label class="switch" style="float: none;display: block;">
+                <input id="notComeModal" name="notComeModal" type="checkbox" class="form-control primary">
+                <span class="slider round"></span>
+         </label>
+    </div>
+
+    <div class="d-flex flex-row align-items-start mb-3">
+        <label for="editNotesModal" class="p-2 col-form-label">{{_('Notas')}}</label>
+        <div class="col">
+            <textarea class="form-control" id="editNotesModal" name="editNotesModal" rows="2" style="height: 100%;"></textarea>
+        </div>
+    </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick="saveRegisterModal()">{{_("Gardar")}}</button>
+        <button type="button" class="btn btn-primary" onclick="closeRegisterModal()">{{_("Saír")}}</button>
+      </div>
+
+    </div>
+  </div>
+</div>

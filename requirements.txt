@@ -1,0 +1,34 @@
+# Direct dependencies — single source of truth
+# Generated: 2026-05-13 | Python 3.x
+# Run: pip install -r requirements.txt
+
+# Core framework
+Flask==3.1.3
+Werkzeug==3.1.8
+
+# Database
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.49
+
+# Auth & Session
+Flask-Login==0.6.3
+Flask-Bcrypt==1.0.1
+cryptography==49.0.0
+
+# Security
+Flask-Talisman==1.1.0
+Flask-WTF==1.2.2
+Flask-Limiter==4.1.1
+
+# Email
+Flask-Mail==0.10.0
+
+# i18n
+flask-babel==4.0.0
+pytz==2026.2
+
+# Files
+openpyxl==3.1.5
+
+# Environment
+python-dotenv==1.2.2
